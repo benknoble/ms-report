@@ -1,3 +1,44 @@
 \section{Introduction}
 
 \subsection{Background}
+
+Formal methods are mathematical techniques for describing and verifying system
+properties~\cite{Wing_90}. They have been successfully applied to the practice
+of programming and computation since the birth of computing:
+\citeauthor{Turing_1937}'s famous 1937 discussion of the {\haltprob} is an
+application of mathematical reasoning to a generalized system of
+computation~\cite{Turing_1937}. The use of formal methods continued throughout
+the modern computing era, with \citeauthor{McCarthy_67} formalizing the first
+proof of a verified compiler in 1967~\cite{McCarthy_67}. The proof was later
+mechanically verified to be correct in 1972~\cite{Milner_72}. The computing
+giant and prolific writer \citeauthor{EWD:EWD1036} argued in 1988 that the very
+nature of programming depended on notions of symbolic manipulation, formal
+semantics, and the task of giving a ``formal proof'' that the proposed program
+``meets the equally formal functional specification''~\cite{EWD:EWD1036}---and
+that Computer Science education at the time generally omitted much of the
+relevant background and material necessary for accomplishing this task.
+
+Formal verification, \citeauthor{EWD:EWD1036}'s act of proving that the program
+implements its specification, has not died as he predicted through a ``foggy
+crystal ball.'' Instead, they have become increasingly powerful, accessible, and
+vital. While computer scientists may often by hesitant to make claims about the
+termination of a particular program~\cite{Cook_2011}, perhaps intimidated by
+\citeauthor{Turing_1937}'s Halting Problem, proofs of termination, correctness,
+non-interference, and more are increasingly necessary and useful to reason about
+programs. For example, such proofs are now used to reason about OS
+kernels~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Sewell_KH_16,Narayanan_2019,Narayan_2020},
+safety-critical systems such as avionics~\cite{Leroy-Compcert-CACM}, in-kernel
+compilers~\cite{186144,258848}, file-systems~\cite{Zou_2019}, and concurrent
+systems~\cite{222565,222621}. These are just a few modern examples in
+systems-contexts; verification has made its way into everyday programming, with
+applications to, \eg, web-scraping, spatial programming, and superoptimization
+for bitvector programs~\cite{Torlak_2013}.
+
+\subsection{Structure}
+
+Section~\ref{S:categories} proposes to classify the technology used to build
+verified programs. Section~\ref{S:applications} examines various applications of
+the technology, tools, and techniques of formal methods to build verified
+programs. Section~\ref{S:discussion} takes a deeper look at common
+architectures, current verification technologies, and challenges. Finally,
+Section~\ref{S:conclusion} concludes.
