@@ -1,0 +1,29 @@
+\usepackage{setspace}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[colorlinks]{hyperref}
+\hypersetup{%
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=cyan,
+    citecolor=blue
+}
+\usepackage[inline]{enumitem}
+\usepackage{mathtools}
+\newlist{inlist}{enumerate*}{1}
+\setlist[inlist]{label= (\alph*)}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{smartdiagram}
+\usepackage{subcaption}
+\usepackage{float}
+\floatstyle{boxed}
+\restylefloat{figure}
+\restylefloat{table}
+\usepackage{biblatex}
+\addbibresource{sources.bib}
+\usepackage[nopostdot,toc,acronym,nomain,nonumberlist]{glossaries}
+{\makeglossaries}
+\loadglsentries[acronym]{glossary}

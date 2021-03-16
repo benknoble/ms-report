@@ -1,0 +1,58 @@
+\documentclass{article}
+
+\input{setup}
+\input{meta}
+\input{macros}
+
+\begin{document}
+
+\title{\mytitle}
+\author{D. Ben Knoble \\
+Department of Computer Science \\
+University of North Carolina at Chapel Hill}
+\date{April 2020}
+
+\maketitle
+
+\begin{abstract}
+    \input{abstract}
+\end{abstract}
+
+Approved by:
+
+Primary reader: Don Porter \hrulefill
+
+Secondary reader: Cynthia Sturton \hrulefill
+
+\begin{singlespace}
+    \newpage
+    \tableofcontents
+
+    \newpage
+    \listoffigures
+    \listoftables
+\end{singlespace}
+
+\newpage
+
+\glsresetall[acronym]
+
+\input{intro}
+
+% \input{categories}
+% \input{applications}
+% \input{discussion}
+
+\glsresetall[acronym]
+
+% \input{conclusion}
+
+\begin{singlespace}
+    \newpage
+    {\printbibliography}
+
+    \newpage
+    \printglossary[title={Abbreviations},type=acronym,style=long]
+\end{singlespace}
+
+\end{document}
