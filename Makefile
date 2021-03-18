@@ -24,7 +24,7 @@ all: $(PDF)
 	$(LATEX) $(LATEX_OPTS) $*
 	$(LATEX) $(LATEX_OPTS) $*
 
-thesis.pdf: thesis.tex setup.tex meta.tex macros.tex
+thesis.pdf: thesis.tex setup.tex meta.tex macros.tex glossary.tex sources.bib
 thesis.pdf: abstract.tex
 thesis.pdf: intro.tex
 # thesis.pdf: applications.tex
