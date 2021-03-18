@@ -47,12 +47,13 @@ is unfortunately coupled with the increasing power of verification tools---the
 latter is necessary to make verification of the formal amenable. Consequently,
 the verification tools also exhibit increasing complexity, with some being
 essentially expert systems\footnote{For a glance at the complexity of some
-systems, see~\cite{Jung_2015,Jung_2016,Krebbers_2017,Jung_2018b}. In fairness,
-as we'll see, this complexity arises from distilling a family of complexities to
-a simpler base, and then using that to proof Rust's safety~\cite{Jung_2018a}}.
-Other systems combine automation with domain knowledge to create a narrower,
-more accessible tool. We will see some examples of this complexity and
-automation in Section~\ref{S:applications}.
+systems, see~\cite{Jung_2015,Jung_2016,Krebbers_2017,Jung_2018b} and
+\figurename~\ref{F:iris_complex}. In fairness, as we'll see, this complexity
+arises from distilling a family of complexities to a simpler base, and then
+using that to proof Rust's safety~\cite{Jung_2018a}.}. Other systems combine
+automation with domain knowledge to create a narrower, more accessible tool. We
+will see some examples of this complexity and automation in
+Section~\ref{S:applications}.
 
 \subsection{The Verified-Programs Stack}
 
@@ -62,40 +63,118 @@ corresponding verification layers. I present a brief overview of these layers,
 with notes on what I will cover in the remainder of the paper and what is out of
 scope; where possible, references are provided for further reading.
 
+The general idea is that, in order to fully trust a program implements its
+specification, we should like a proof at the source level and proofs that each
+of the intervening levels between source and final execution preserve the
+validity of the proof; in other words, that the final result can still be said
+formally to implement the specification without the work of repeating the proof
+at each stage.
+
 The model presented in \figurename~\ref{F:abstraction} generally ignores
-distributed systems and newer environments like the cloud; here we are really
+distributed systems and newer environments like the cloud; here I am primarily
 concerned with a program running on a single machine, though it is possible to
-generalize the model. Much of the technology we will see in this paper has been
-or can be extended to distributed systems, though it requires care.
+generalize the model. I also ignore containerization, orchestration, and build
+and deployment pipelines insofar as they are represented as user-space programs
+or compositions thereof. Build pipelines naturally include compilers, which are
+shown in the model despite being user-space programs. Much of the technology we
+will see in this paper has been or can be extended to these domains.
+
+Also out of scope is full-stack verification in the vein of
+IronClad~\cite{hawblitzel2014ironclad} and
+IronFleet~\cite{hawblitzel2015ironfleet}. Here I am considering the individual
+components, especially the top layers.
 
 \begin{figure}[hb]
     \centering
-    \begin{tikzpicture}[stack/.style={rectangle split, rectangle split, draw, anchor=center}]
+    \begin{tikzpicture}[stack/.style={rectangle split, rectangle split parts=5, draw, anchor=center}]
         \node[stack](prog){%
             \nodepart{one}Program source
             \nodepart{two}Compiler or Interpreter
-            \nodepart{three}OS and Kernel
-            \nodepart{four}Hardware
+            \nodepart{three}Executable Machine Code
+            \nodepart{four}OS and Kernel
+            \nodepart{five}Hardware
         };
         \node[stack,right=of prog](verification){%
             \nodepart{one}Program verification
             \nodepart{two}Verified compilers or interpreters
-            \nodepart{three}Verified OS
-            \nodepart{four}Verified Hardware
+            \nodepart{three}Translation Validation
+            \nodepart{four}Verified OS and Kernel
+            \nodepart{five}Verified Hardware
         };
         \draw[<->] (prog.one east) -- (verification.one west);
         \draw[<->] (prog.two east) -- (verification.two west);
         \draw[<->] (prog.three east) -- (verification.three west);
         \draw[<->] (prog.four east) -- (verification.four west);
+        \draw[<->] (prog.five east) -- (verification.five west);
     \end{tikzpicture}
     \caption{A simplified programming environment and execution stack, with corresponding verification technology}\label{F:abstraction}
 \end{figure}
 
+At the very top of the stack, we have the program source. Whether high-level or
+low-level, this is the definition of what we want the computer to do.
+Verification requires a formal specification of that behavior and a proof that
+the source-as-written, coupled with the language's formal semantics, implement
+that behavior. We will study almost entirely tools and techniques for
+accomplishing this task. Some key components include
+\begin{inlist}
+\item the kind of verifier (\eg, push-button or interactive);
+\item the logic of the verifier (\eg, \gls{smt} or higher-order constructive
+    propositional logic via \gls{coc}); and
+\item the logical system of the proof (\eg, separation logic).
+\end{inlist}
+
+In order to execute the program, we have the remaining layers. In order:
+\begin{enumerate}
+    \item\label{i:stack_translator} A program translator (compiler or
+        interpreter)\footnote{These are almost eschewed in the case of the
+        assembly programmer; yet, there is still the assembler or linker to
+        contend with.}
+    \item\label{i:stack_asm} The produced executable machine code (\eg, ELF
+        binaries)
+    \item\label{i:stack_OS} The OS and kernel responsible for managing execution
+        of the machine code
+    \item\label{i:stack_hardware} The underlying hardware that carries out the
+        instructions
+\end{enumerate}
+
+Items~\ref{i:stack_OS} and~\ref{i:stack_hardware} are out of scope for this
+paper. I refer the interested reader to research on verified OS and
+kernels~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Sewell_KH_16,Narayanan_2019,Narayan_2020}
+and on verifying
+processors~\cite{sturton-memocode13,Sturton_2013,Bradfield_2016,zhang2017identifying,zhang2018recursive,zhang2018end}.
+
+Item~\ref{i:stack_asm} is particularly interesting and has generated much work
+on translation validation~\cite{Pnueli_1998}. This kind of verification proceeds
+by validating each run of a compiler, comparing the executable code to the
+source and guaranteeing that a \emph{particular} set of executable code
+implements a \emph{particular} set of program source code. I will have only
+slightly more to say on this subject when we get to verified compilers; I point
+the interested reader to works such
+as~\cite{Sewell:phd,Sewell_KH_16,Sewell_2013,Necula_2000}.
+
+This leaves item~\ref{i:stack_translator}, the program translator. In
+safety-critical systems, it is vital that there be no miscompilation, \ie, bugs
+introduced by compilation. Even outside of such restrictive domains, it is
+important to trust that the compiler faithfully compiles source code; otherwise,
+our systems are all subject to vicious attack~\cite{Thompson_1984}. Thus a
+verified compiler\footnote{with verified interpreters a combination of an
+on-the-fly compiler and a user-space program, though they have their own unique
+challenges} is an important component in the software-development tool-chain.
+Verifying a compiler amounts to both a proof about a particular program---the
+compiler itself---\emph{and} a proof about a \emph{class} of programs---those
+accepted and generated by the compiler. One hopes that a verified compiler
+preserves proofs about the source; that is, if a program \(S\) is proven to have
+some property \(P\) (written \(S \models P\) after~\cite{Leroy-Compcert-CACM}),
+compiling with a verified compiler \(C\) should imply that \(C(S) \models P\).
+Thus we have a statement about an entire class of programs, and it is this type
+of statement that allows the composition of proven layers to itself be proven.
+
 \subsection{Structure}
 
-Section~\ref{S:categories} proposes to classify the technology used to build
-verified programs. Section~\ref{S:applications} examines various applications of
-the technology, tools, and techniques of formal methods to build verified
-programs. Section~\ref{S:discussion} takes a deeper look at common
-architectures, current verification technologies, and challenges. Finally,
-Section~\ref{S:conclusion} concludes.
+In Section~\ref{S:categories} I propose to classify the technology used to build
+verified programs. In Section~\ref{S:applications} I examine various
+applications of the technology, tools, and techniques of formal methods to build
+verified programs and identify a few prominent strategies. In
+Section~\ref{S:discussion} I take a deeper look at common architectures, current
+verification technologies, and challenges. Finally, I conclude with
+Section~\ref{S:conclusion}.
