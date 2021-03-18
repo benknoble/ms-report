@@ -1,5 +1,11 @@
 \section{Introduction}
 
+First, I introduce the ideas of formal methods and formal verification, in
+particular their connection to programming. Next, I briefly dissect the various
+layers of abstraction that programmers operate in and the corresponding
+layers of verification. Finally, I outline the direction of the rest of the
+paper.
+
 \subsection{Background}
 
 Formal methods are mathematical techniques for describing and verifying system
@@ -14,25 +20,76 @@ mechanically verified to be correct in 1972~\cite{Milner_72}. The computing
 giant and prolific writer \citeauthor{EWD:EWD1036} argued in 1988 that the very
 nature of programming depended on notions of symbolic manipulation, formal
 semantics, and the task of giving a ``formal proof'' that the proposed program
-``meets the equally formal functional specification''~\cite{EWD:EWD1036}---and
-that Computer Science education at the time generally omitted much of the
-relevant background and material necessary for accomplishing this task.
+``meets the equally formal functional specification''---and that Computer
+Science education at the time generally omitted much of the relevant background
+and material necessary for accomplishing this task~\cite{EWD:EWD1036}.
 
 Formal verification, \citeauthor{EWD:EWD1036}'s act of proving that the program
 implements its specification, has not died as he predicted through a ``foggy
 crystal ball.'' Instead, they have become increasingly powerful, accessible, and
-vital. While computer scientists may often by hesitant to make claims about the
-termination of a particular program~\cite{Cook_2011}, perhaps intimidated by
-\citeauthor{Turing_1937}'s Halting Problem, proofs of termination, correctness,
-non-interference, and more are increasingly necessary and useful to reason about
-programs. For example, such proofs are now used to reason about OS
+vital, as I aim to elucidate here. Some computer scientists hesitate to make
+claims about the termination of a particular program~\cite{Cook_2011}, perhaps
+intimidated by \citeauthor{Turing_1937}'s Halting Problem arguments; yet, proofs
+of termination, correctness, non-interference, and more are increasingly
+necessary and useful to reason about programs. For example, such proofs are now
+used to reason about OS
 kernels~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Sewell_KH_16,Narayanan_2019,Narayan_2020},
-safety-critical systems such as avionics~\cite{Leroy-Compcert-CACM}, in-kernel
-compilers~\cite{186144,258848}, file-systems~\cite{Zou_2019}, and concurrent
-systems~\cite{222565,222621}. These are just a few modern examples in
+safety-critical systems such as avionics~\cite[\S 1]{Leroy-Compcert-CACM},
+in-kernel compilers~\cite{186144,258848}, file-systems~\cite{Zou_2019}, and
+concurrent systems~\cite{222565,222621}. These are just a few modern examples in
 systems-contexts; verification has made its way into everyday programming, with
 applications to, \eg, web-scraping, spatial programming, and superoptimization
-for bitvector programs~\cite{Torlak_2013}.
+for bitvector programs~\cite[\S 4]{Torlak_2013}.
+
+In parallel to the growing efforts of formal verification, rising complexity
+presents ongoing challenges to the development and correctness of software. This
+is unfortunately coupled with the increasing power of verification tools---the
+latter is necessary to make verification of the formal amenable. Consequently,
+the verification tools also exhibit increasing complexity, with some being
+essentially expert systems\footnote{For a glance at the complexity of some
+systems, see~\cite{Jung_2015,Jung_2016,Krebbers_2017,Jung_2018b}. In fairness,
+as we'll see, this complexity arises from distilling a family of complexities to
+a simpler base, and then using that to proof Rust's safety~\cite{Jung_2018a}}.
+Other systems combine automation with domain knowledge to create a narrower,
+more accessible tool. We will see some examples of this complexity and
+automation in Section~\ref{S:applications}.
+
+\subsection{The Verified-Programs Stack}
+
+To examine the technology behind verified programs, it will be helpful to
+understand the layers of abstraction in today's programming environments and the
+corresponding verification layers. I present a brief overview of these layers,
+with notes on what I will cover in the remainder of the paper and what is out of
+scope; where possible, references are provided for further reading.
+
+The model presented in \figurename~\ref{F:abstraction} generally ignores
+distributed systems and newer environments like the cloud; here we are really
+concerned with a program running on a single machine, though it is possible to
+generalize the model. Much of the technology we will see in this paper has been
+or can be extended to distributed systems, though it requires care.
+
+\begin{figure}[hb]
+    \centering
+    \begin{tikzpicture}[stack/.style={rectangle split, rectangle split, draw, anchor=center}]
+        \node[stack](prog){%
+            \nodepart{one}Program source
+            \nodepart{two}Compiler or Interpreter
+            \nodepart{three}OS and Kernel
+            \nodepart{four}Hardware
+        };
+        \node[stack,right=of prog](verification){%
+            \nodepart{one}Program verification
+            \nodepart{two}Verified compilers or interpreters
+            \nodepart{three}Verified OS
+            \nodepart{four}Verified Hardware
+        };
+        \draw[<->] (prog.one east) -- (verification.one west);
+        \draw[<->] (prog.two east) -- (verification.two west);
+        \draw[<->] (prog.three east) -- (verification.three west);
+        \draw[<->] (prog.four east) -- (verification.four west);
+    \end{tikzpicture}
+    \caption{A simplified programming environment and execution stack, with corresponding verification technology}\label{F:abstraction}
+\end{figure}
 
 \subsection{Structure}
 
