@@ -24,6 +24,13 @@ all: $(PDF)
 	$(LATEX) $(LATEX_OPTS) $*
 	$(LATEX) $(LATEX_OPTS) $*
 
+thesis.pdf: thesis.tex setup.tex meta.tex macros.tex
+thesis.pdf: abstract.tex
+thesis.pdf: intro.tex
+# thesis.pdf: applications.tex
+thesis.pdf: discussion.tex
+thesis.pdf: conclusion.tex
+
 defense.pdf: defense.tex
 	$(LATEX) $(LATEX_OPTS) $*
 	$(BIBTEX) $(BIBTEX_OPTS) $*
