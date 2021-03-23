@@ -164,29 +164,81 @@ to~\cite{Winskel_1993,Harper_2016} for introductions to program semantics.
 
 When turning to program verification\footnote{Recall \citeauthor{EWD:EWD1036}'s
 act of proving a program implements its specification.}, \emph{Software
-Foundations} introduces Hoare logic. Originating in \citeyear{Hoare_1969} with
-\citeauthor{Hoare_1969}'s paper~\cite{Hoare_1969}, Hoare logic formalizes the
-notion of pre- and post-conditions with the \emph{Hoare triple}, written
+Foundations} introduces Hoare logic. Hoare logic, with its many variations, is
+the predominant proof-logic for program verification.
+
+Originating in \citeyear{Hoare_1969} with \citeauthor{Hoare_1969}'s
+paper~\cite{Hoare_1969}, Hoare logic formalizes the notion of pre- and
+post-conditions with the \emph{Hoare triple}, written
 
 \begin{equation*}
-    \{P\}C\{Q\},
+    \{P\} C \{Q\},
 \end{equation*}
 
 to indicated that command \(C\) has pre-condition \(P\) and post-condition
 \(Q\), both assertions (\eg, a claim about the current state). If \(P\) is
 established, executing \(C\) establishes \(Q\) (or \(C\) diverges). One
-indicates that \(C\) diverges by choosing \(Q = \bottom\) or \(Q = \false\).
-Hoare logic permits reasoning about partial correctness; termination must be
-proven separately\footnote{Various sources claim it is possible to give rules
-for total correctness.}. Reasoning with Hoare logic mimics the structure of the
-program, as triples can be effectively combined to build up claims about the
-entire program. The rules for doing so resemble those of ``regular'' logic
-formulae above, with some connectives for strengthening pre-conditions or
-weakening post-conditions. Formalizations and uses of these rules often work
-backwards; the natural way to construct a Hoare-logic proof is to start at the
-final post-condition and move backwards to the beginning.
+indicates that \(C\) diverges in a Hoare triple by choosing \(Q = \bot\). Hoare
+logic permits reasoning about partial correctness; termination must be proven
+separately\footnote{Various sources claim it is possible to give rules for total
+correctness.}. The statement of the triple can thus be written using notation
+from \figurename~\ref{F:Imp_ex}, and assuming \(P\) and \(Q\) are functions from
+states to propositions
+
+\begin{align*}
+    \{P\} C \{Q\} \definedas \forall s, s' : &(C, s) \To s' &\text{if \(C\) terminates} \\
+    &\implies P s &\text{and if \(P s\) holds} \\
+    &\implies Q s' &\text{then we can establish \(Q s'\) holds.}
+\end{align*}
+
+This is a model-theoretic Hoare-logic: the proof-rules are stated in the terms
+of the model. Hoare-logic can also be defined in proof-theory; this is arguably
+more common~\cite[Ch. \emph{Hoare Logic as a Logic}]{Pierce:SF2}. Such a
+statement avoids ascribing direct meaning to Hoare-triples and instead gives
+syntactic derivation rules. These rules are the same judgements as in the
+model-theoretic definition, and the two are consistent with each other.
+
+Reasoning with Hoare logic mimics the structure of the program,
+as triples can be effectively combined to build up claims about the entire
+program. The rules for doing so resemble those of ``regular'' logic formulae
+above, with some connectives for strengthening pre-conditions or weakening
+post-conditions. Formalizations and uses of these rules often work backwards;
+the natural way to construct a Hoare-logic proof is to start at the final
+post-condition and move backwards to the beginning. A selection of rules are
+presented in \figurename~\ref{F:Hoare_ex}.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{c}
+        Hoare-Consequence-Pre \\
+        \(\{P'\} C \{Q\}\) \quad \(P \TO P'\) \\
+        \midrule
+        \(\{P\} C \{Q\}\) \\
+
+        \\
+
+        Hoare-Seq \\
+        \(\{P\} C_1 \{Q\}\) \quad \(\{Q\} C_2 \{R\}\) \\
+        \midrule
+        \(\{P\} C_1;C_2 \{R\}\)
+    \end{tabular}
+    \caption{Two examples of the rules of Hoare logic. Hoare-Consequence-Pre
+    captures the notion that we can strengthen the pre-condition from \(P'\) to
+    \(P\) and still have a valid triple (\(\TO\) is analogous to implication,
+    with the definition \(\forall s: P s \implies P' s\)). Hoare-Seq provides an
+    analogue to E-Seq from \figurename~\ref{F:Imp_ex}. The programmer composes
+    rules like these rather than invoking the definition of a Hoare-triple
+    whenever possible, using a higher level of abstraction.}\label{F:Hoare_ex}
+\end{figure}
+
+% Definition is_wp P c Q :=
+%   {{P}} c {{Q}} ∧
+%   ∀ P', {{P'}} c {{Q}} → (P' ->> P).
 
 %todo: extensions of Hoare-logic. SL, CSL. cf. Appel paper \cite{Appel_2011}
+
+% small-step semantics: for reasoning about stuck-ness, progress, parallelism,
+% types
 
 \subsection{Type of Supported Programming Languages}\label{S:t_pl}
 
