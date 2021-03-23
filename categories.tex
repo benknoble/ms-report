@@ -1,0 +1,231 @@
+\section{Categorizing Verified-programming Tools}\label{S:categories}
+
+I propose 3 axes along which to classify the tools used to verify programs.
+These are
+\begin{enumerate}
+    \item the type of interaction;
+    \item the type of proof logic; and
+    \item the type of supported programming languages.
+\end{enumerate}
+
+I examine each in turn in Sections~\ref{S:t_interaction},~\ref{S:t_logic},
+and~\ref{S:t_pl}.
+
+One might also include the logic of the underlying verifier, especially in cases
+where it differs from the proof logic. I choose not to because in the cases I
+have studied they are the same (\eg, a Coq program proven in Coq~\cite{Coq}),
+one is encoded in the other (\eg, a Dafny~\cite{leino2010dafny} program proven
+by translation to Boogie~\cite{Barnett_2006,leino2008this}), or one is not
+relevant to the other (\eg, proofs in Iris's logic~\cite{Jung_2018b} use Iris's
+proof rules, while Iris is built on Coq). The programmer tasked with writing the
+proof is concerned with the logic of the proof-system and the proof to be
+written, except in the hopefully rare case of leaky
+abstractions~\cite{Spolsky_2002}.
+
+\subsection{Type of Interaction}\label{S:t_interaction}
+
+By ``interaction'' I mean that between the programmer and the verifier: what is
+necessary to formulate proofs? Borrowing the terminology of~\cite[\S 2]{Nelson_2019},
+I dissect this axis into 3 major types of interaction:
+\begin{enumerate}
+    \item Interactive,
+    \item Auto-active, and
+    \item Automatic (sometimes called ``push-button'').
+\end{enumerate}
+
+For each type the referenced~\cite{Nelson_2019} provides a plethora of further
+examples.
+
+\paragraph{Interactive verification.} This is the model employed by interactive
+theorem-provers and proof-assistants such as Coq~\cite{Coq},
+Isabelle~\cite{Isabelle}, and HOL~\cite{HOL}. The programmer, having written
+programs and specifications, states theorems relating them (or lemmata,
+corollaries, \etc, as the case may be). In order to prove the statements, the
+programmer interacts directly with the system in a sort of call-and-response.
+The verifier presents a goal: prove this statement. The programmer can execute
+tactics to manipulate the goal, introduce quantified variables and hypothesis,
+and otherwise make progress towards the proof of the goal. The verifier
+represents the effect of these executions with another response, \eg, prove this
+statement in this context. The programmer continues this dialogue with the
+verifier, perhaps walking backwards and trying a different approach or walking
+forwards through the steps of the proof, until the verifier has been given a
+complete proof of all necessary goals.
+
+Such systems may support automation in the sense of tactics that invoke other
+tactics based on the goal or context; these can range from proof searches to
+constraint solvers over linear integer arithmetic to manipulations necessary to
+hide details of the underlying logical system.
+
+\paragraph{Auto-active verification.} The approach taken by systems like
+Dafny~\cite{leino2010dafny}. The programmer annotates code both with
+specifications and proof hints, such as pre- or post- conditions or loop
+invariants. The verifier translates the source into a verification condition and
+uses a constraint solver to finish the verification. Some systems, such as
+Dafny, permit annotations that rise nearly to the level of proof texts like
+those of interactive verification, with composable theorems and lemmata in
+addition to functional specifications and standard annotations. While writing
+the proofs, though, the current state of the  goal and proof context are often
+hidden or implicit, since they are being translated for the constraint
+solver\footnote{The original goal and context are of course visible in the
+original statement being proven.}. A call-and-response effort is possible in
+such systems to complete a proof, but a major challenge is to discover what the
+automatic part of the system cannot prove and actively provide effective hints
+to make progress. One power of this type of system is to free the programmer
+from all the details of the proof; the verifier often can handle simple
+statements on its own, while more complex statements can be proven with only a
+few well-directed hints. On the other hand, discovering which hints to use is
+like a game of ``20 Questions''\footnote{The programmer asks ``Would you be
+able to make progress on the proof if I could convince you of \(P\)?'' Based on
+the verifier's response, which is essentially ``yes'' or ``no'', a sub-proof of
+\(P\) is given through hints or not, and the game continues. The summer course
+in~\cite{Kapritsos_2020} provides a detailed look at this style of proof in
+Dafny.}, and the resulting proofs can be difficult to read.
+
+\paragraph{Automatic verification.} The approach taken by
+Rosette~\cite{Torlak_2013}. An automatic verifier restricts the class of
+properties and programs that be verified in order to fully automate the process.
+The essential limit is finitization: finite specifications that can be
+implemented without unbounded loops allows symbolic evaluation or execution to
+generate constraints that can be handed off to a solver, much like in
+auto-active verification. The developer thus programs in such a restricted
+system and pushes the ``verify button'', invoking the symbolic evaluator and
+constraint solver. The limitations allow a greater degree of automation than in
+the previous cases, leading to the descriptor ``push-button verification''---no
+proof annotations are necessary. Such systems have been used to build
+surprisingly sophisticated programs given the finitization requirement; examples
+include the Yggdrasil file-system~\cite{Sigurbjarnarson_2016} and the
+Hyperkernel OS~\cite{Nelson_2017}.
+
+A related challenge is exponential path explosion: symbolic evaluation may have
+to consider a rapidly-growing number of symbolic paths while generating
+constraints. Rosette takes steps to solve this via aggressive partial
+evaluation~\cite{Torlak_2013,Torlak_2014}, lenient symbolic
+execution~\cite{Chang_2018}, and
+profiling~\cite{Bornholt_2018,Porncharoenwase_2020}. Also related, as in the
+case of auto-active verification, is the challenge of communicating back to the
+developer the meaning of the results in the program domain.
+
+\subsection{Type of Proof Logic}\label{S:t_logic}
+
+A full account of proof-logics for programs would be a long paper in its own
+right and is out-of-scope for this report. Look no further than
+\figurename~\ref{F:iris_complex} to see how complicated the topology of (a
+subset of) proof-logics can be. Instead, I will mention a few key proof-logics
+and some of their extensions.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/iris_2_0_concurrent_logics}
+    \caption{A figure from a presentation on Iris~\cite{Jung_2016_slides}
+    depicting the relationship of many concurrent separation logics developed
+    specially for a system or proof. Iris notably attempts to distill these
+    logics to their core, providing a system inside of which any of the
+    individual logics may be derived.}\label{F:iris_complex}
+\end{figure}
+
+All proof-logics for programs combine a set of logic-rules with the semantics of
+the program's language. In the simplest case, the programmer combines
+``regular'' logic (in the sense of \gls{coc} or ZFC) with the semantics to write
+proofs about program equivalences, termination, and transformations.
+\emph{Software Foundations} shows it's possible to prove interesting
+meta-theoretic\footnote{``meta'' because they are ``properties of the language
+as a whole, rather than of particular programs''~\cite{Pierce:SF2}. It is also
+possible to prove claims about specific programs this way, but, at least in some
+systems, this becomes unwieldy.} claims about a language using these techniques
+in their discussions about \emph{Simple Imperative Programs}~\cite{Pierce:SF1}
+and \emph{Program Equivalence}~\cite{Pierce:SF2} and provides an introduction to
+such proofs. Essentially, standard reasoning rules about logic formulae are
+combined with the inference rules that define the semantics. An example is
+provided in \figurename~\ref{F:Imp_ex}. I refer
+to~\cite{Winskel_1993,Harper_2016} for introductions to program semantics.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{c}
+        E-APlus \\
+        \(e_1 \to n_1\) \quad \(e_2 \to n_2\) \\
+        \midrule
+        \(e_1 +_e e_2 \to n_1 + n_2\) \\
+
+        \\
+
+        E-Seq \\
+        \((c_1, s_1) \To s_2\) \quad \((c_2, s_2) \To s_3\) \\
+        \midrule
+        \((c_1;c_2, s_1) \To s_3\)
+    \end{tabular}
+    \caption{Sample inference rules for \texttt{Imp}, a simple imperative
+    language. E-APlus shows how to add two arithmetic expressions, where \(\to\)
+    means ``evaluates to.'' Similarly, E-Seq shows how to sequence two
+    statements \(c_1, c_2\), where \((c, s)\) represents a pair of a statement
+    and a state and \((c, s) \To s'\) means ``evaluating statement \(c\) in
+    state \(s\) produces the new state \(s'\).''}\label{F:Imp_ex}
+\end{figure}
+
+When turning to program verification\footnote{Recall \citeauthor{EWD:EWD1036}'s
+act of proving a program implements its specification.}, \emph{Software
+Foundations} introduces Hoare logic. Originating in \citeyear{Hoare_1969} with
+\citeauthor{Hoare_1969}'s paper~\cite{Hoare_1969}, Hoare logic formalizes the
+notion of pre- and post-conditions with the \emph{Hoare triple}, written
+
+\begin{equation*}
+    \{P\}C\{Q\},
+\end{equation*}
+
+to indicated that command \(C\) has pre-condition \(P\) and post-condition
+\(Q\), both assertions (\eg, a claim about the current state). If \(P\) is
+established, executing \(C\) establishes \(Q\) (or \(C\) diverges). One
+indicates that \(C\) diverges by choosing \(Q = \bottom\) or \(Q = \false\).
+Hoare logic permits reasoning about partial correctness; termination must be
+proven separately\footnote{Various sources claim it is possible to give rules
+for total correctness.}. Reasoning with Hoare logic mimics the structure of the
+program, as triples can be effectively combined to build up claims about the
+entire program. The rules for doing so resemble those of ``regular'' logic
+formulae above, with some connectives for strengthening pre-conditions or
+weakening post-conditions. Formalizations and uses of these rules often work
+backwards; the natural way to construct a Hoare-logic proof is to start at the
+final post-condition and move backwards to the beginning.
+
+%todo: extensions of Hoare-logic. SL, CSL. cf. Appel paper \cite{Appel_2011}
+
+\subsection{Type of Supported Programming Languages}\label{S:t_pl}
+
+The supported languages are as varied as the programming language options
+available to today's programmer, from MLs~\cite{Coq}, Lisps and
+Schemes~\cite{Torlak_2013} to object-oriented
+systems~\cite{leino2008specification,leino2010dafny} to bare-metal
+assembly~\cite{Chlipala_2011} on top of which further abstractions can be
+built~\cite{Chlipala_2015}. While this variety appears to present overwhelming
+choice to the programmer who wishes to verify a program, reality belies a
+simpler problem: some languages and design decisions are better suited to
+certain problem domains than others. Correspondingly, certain proof logics are
+better suited to certain domains, and one often finds pairings between language
+and logic for the task at hand.
+
+I recommend a few starting points for programmers seeking a particular language
+style for their problems and discuss options available to those unsatisfied with
+the existing languages.
+
+The systems programmer is apt to look more towards C and Rust like systems; this
+lends itself to a choice of tools like Bedrock~\cite{Chlipala_2011},
+\gls{vst}~\cite{VST}, and CompCert~\cite{Kastner-LBSSF-2017}, possibly paired
+with (concurrent) separation logic.
+
+The imperative programmer might look at Ynot~\cite{Nanevski08ynot:reasoning},
+though only if comfortable with monadic reasoning and Hoare logic.
+
+Programmers in ML-like languages have Coq and similar tools to choose from;
+Lispers and Schemers look to both relational-logic systems like
+Kanren~\cite{Byrd_2009} and automatic verifiers like Rosette.
+
+For the unsatisfied, Rosette promises the ability to build automatic
+solver-aided languages suited to the problem at hand~\cite{Torlak_2013}. For
+those seeking an auto-active style, the discussion
+in~\cite{leino2008specification} offers a design for an object-oriented language
+that could be adapted. When building a for a completely interactive environment,
+building on top of existing systems is the norm. It is always possible to build
+a compiler\footnote{or \emph{transpiler}, as some prefer} targeting a
+higher-level verified language---the programmer thus has complete control of the
+surface language, at the cost of building, maintaining, and perhaps verifying a
+compiler. The ease of such an effort depends on how well the languages semantics
+match; syntax is a matter of appropriate translation.
