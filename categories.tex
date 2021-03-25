@@ -235,10 +235,12 @@ presented in \figurename~\ref{F:Hoare_ex}.
     whenever possible, using a higher level of abstraction.}\label{F:Hoare_ex}
 \end{figure}
 
-I should note that Hoare logics are mostly seen for imperative programming
-languages. (\emph{TODO what about functional languages? Rust is nearly
-functional, but \(\lambda_{\text{Rust}}\) from RustBelt uses a CPS-style
-\(\lambda\)-calculus combined with CSL in Iris?})
+I should note that, while Hoare logics are mostly seen for imperative
+programming languages, they are also applicable to functional languages. For
+example, Iris~\cite[\S 5.1]{Krebbers_2017b} and the RustBelt project~\cite[\S
+3.2, esp. \figurename~3]{Jung_2018a} have demonstrated the applicability of a
+particular kind of Hoare logic to both \(\lambda\)-calculus style and ML-like
+languages.
 
 \subsubsection{Pre-, post-, and weakest conditions}
 
