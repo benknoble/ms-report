@@ -24,6 +24,8 @@ abstractions~\cite{Spolsky_2002}.
 
 \subsection{Type of Interaction}\label{S:t_interaction}
 
+\emph{TODO does \texttt{paragraph} or \texttt{subsubsection} work better?}
+
 By ``interaction'' I mean that between the programmer and the verifier: what is
 necessary to formulate proofs? Borrowing the terminology of~\cite[\S 2]{Nelson_2019},
 I dissect this axis into 3 major types of interaction:
@@ -108,10 +110,11 @@ developer the meaning of the results in the program domain.
 \subsection{Type of Proof Logic}\label{S:t_logic}
 
 A full account of proof-logics for programs would be a long paper in its own
-right and is out-of-scope for this report. Look no further than
+right and is out of scope for this report. Look no further than
 \figurename~\ref{F:iris_complex} to see how complicated the topology of (a
 subset of) proof-logics can be. Instead, I will mention a key proof-logic
-(namely, Hoare logic) and some of its extensions.
+(namely, Hoare logic) and some of its extensions. For another mention of
+program- and proof- logics and their uses, see~\cite[\S 5]{Appel_2011}.
 
 \begin{figure}
     \centering
@@ -176,7 +179,7 @@ Hoare logic formalizes the notion of pre- and post-conditions with the
     \{P\} C \{Q\},
 \end{equation*}
 
-to indicated that command \(C\) has pre-condition \(P\) and post-condition
+to indicate that command \(C\) has pre-condition \(P\) and post-condition
 \(Q\), both assertions (\eg, a claim about the current state). If \(P\) is
 established, executing \(C\) establishes \(Q\) (or \(C\) diverges). The
 programmer indicates that \(C\) diverges in a Hoare triple by choosing \(Q =
@@ -192,10 +195,10 @@ functions from states to propositions
     &\implies Q s' &\text{then we can establish \(Q s'\) holds.}
 \end{align*}
 
-This is a model-theoretic Hoare-logic: the proof-rules are stated in the terms
-of the model. Hoare-logic can also be defined in proof-theory; this is arguably
+This is a model-theoretic Hoare logic: the proof-rules are stated in the terms
+of the model. Hoare logic can also be defined in proof-theory; this is arguably
 more common~\cite[Ch. \emph{Hoare Logic as a Logic}]{Pierce:SF2}. Such a
-statement avoids ascribing direct meaning to Hoare-triples and instead gives
+statement avoids ascribing direct meaning to Hoare triples and instead gives
 syntactic derivation rules. These rules are the same judgements as in the
 model-theoretic definition, and the two are consistent with each other.
 
@@ -204,7 +207,7 @@ as triples can be effectively combined to build up claims about the entire
 program. The rules for doing so resemble those of ``regular'' logic formulae
 above, with some connectives for strengthening pre-conditions or weakening
 post-conditions. Formalizations and uses of these rules often work backwards;
-the natural way to construct a Hoare-logic proof is to start at the final
+the natural way to construct a Hoare logic proof is to start at the final
 post-condition and move backwards to the beginning. A selection of rules are
 presented in \figurename~\ref{F:Hoare_ex}.
 
@@ -228,9 +231,14 @@ presented in \figurename~\ref{F:Hoare_ex}.
     \(P\) and still have a valid triple (\(\TO\) is analogous to implication,
     with the definition \(\forall s: P s \implies P' s\)). Hoare-Seq provides an
     analogue to E-Seq from \figurename~\ref{F:Imp_ex}. The programmer composes
-    rules like these rather than invoking the definition of a Hoare-triple
+    rules like these rather than invoking the definition of a Hoare triple
     whenever possible, using a higher level of abstraction.}\label{F:Hoare_ex}
 \end{figure}
+
+I should note that Hoare logics are mostly seen for imperative programming
+languages. (\emph{TODO what about functional languages? Rust is nearly
+functional, but \(\lambda_{\text{Rust}}\) from RustBelt uses a CPS-style
+\(\lambda\)-calculus combined with CSL in Iris?})
 
 \subsubsection{Pre-, post-, and weakest conditions}
 
@@ -240,14 +248,18 @@ the post-condition is some \(Q\) that implies \(\var{Spec}\). Similarly, a
 natural choice for the pre-condition is some \(P\), possibly corresponding to
 constraints on the program inputs, and that also allows the programmer to prove
 \(\{P\} C \{Q\}\). Then we can claim that if \(C\) terminates under
-pre-conditions \(P\), \(C \models \var{Spec}\).
+pre-conditions \(P\) then \(P \implies C \models \var{Spec}\).
 
 The programmer could also choose \(P = \bot\), in which case any post-condition
-at all is valid, including the \(Q\) that entails \(\var{Spec}\) from earlier.
-But this ridiculous pre-condition is never satisfied, so in practice we have
-proven nothing about \(C\)! In a similar vein, we can always add extraneous
-information to the pre-condition which is not used; this does not necessarily
-invalidate our proof in the same way, but it may not be needed.
+at all is valid, including the \(Q\) that entails \(\var{Spec}\) from earlier
+(check the definition of the triple, and observe that this is a case of the
+principle of explosion). But this ridiculous pre-condition is never satisfied,
+so in practice we have proven nothing about \(C\), except that if it terminates
+any behavior whatsoever is allowed!
+
+In a similar vein, we can always add extraneous information to the pre-condition
+which is not used; this does not necessarily invalidate our proof in the same
+way, but such information may not be needed.
 
 To prevent such absurd pre-conditions as \(\bot\) and to streamline their
 generation, many systems make use of ``weakest
@@ -273,17 +285,64 @@ not a proof. An extended example is found in~\cite[\S 3]{leino2008specification}
 where weakest pre-conditions provide the vehicle used to translate from
 Dafny~\cite{leino2010dafny} to Boogie~\cite{Barnett_2006,leino2008this}.
 
-%todo: extensions of Hoare-logic. SL, CSL. cf. Appel paper \cite{Appel_2011}
+\subsubsection{Separation Logic}
 
-% small-step semantics: for reasoning about stuck-ness, progress, parallelism,
-% types
+According to~\cite[\S 5]{Appel_2011}, ``Ordinary Hoare logics have difficulty
+with pointers and arrays, especially with updates of fields and array slots.''
+To solve this problem, \citeauthor{Reynolds} invented \emph{separation
+logic}~\cite{Reynolds}.
+
+The crucial extension is to differentiate between the assertion \(P \land Q\),
+which denotes that both conjuncts hold on the current state, and the assertion
+\(P * Q\), which denotes that each conjunct holds on a disjoint part of the
+current state. In other words, the state \(s\) can be split into \(s_1, s_2\)
+(often written \(s = s_1 \uplus s_2\)) such that \(P\) holds on \(s_1\) and
+\(Q\) holds on \(s_2\). Along with rules for manipulating this new separating
+conjunction, the programmer gains the ability to reason about separate parts of
+the store or state.
+
+Other important rules in separation logics correspond to framing (as in
+``framing the world'', not ``stack frames'') and address and pointer manipulation.
+
+\subsubsection{Concurrent Separation Logic}
+
+For reasoning about concurrency, Hoare logic and separation logic remained
+inadequate; \citeauthor{O_Hearn_2007} proposed a \emph{concurrent separation
+logic} to solve the problem~\cite{O_Hearn_2007}. \citeauthor{Brookes_2007}
+provides a model in the companion paper~\cite{Brookes_2007}. Both papers discuss
+the difficulty of soundness in such a logic---that, and the plethora of
+subsequent separation and concurrent logics that have been developed
+(\figurename~\ref{F:iris_complex}), each with their own complex rules,
+demonstrate the difficulty both of developing and reasoning in a concurrent
+separation logic. Reasoning about parallel programs may bring inherent
+complexity to the problem. The various concurrent logics add rules required for
+their specific uses, \eg, partial ownership or permissions in the case
+of~\cite{Appel_2011}, which might require use of a separation algebra. Iris
+carries these constructions to their limits, developing a foundational
+separation algebra and parameterized logic that can be used to derive new
+logics~\cite{Jung_2018b}.
+
+One of the original concurrent separation logic proof rules
+from~\cite{O_Hearn_2007} is presented in \figurename~\ref{F:CSL_ex}.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{c}
+        \(\{P_1\} C_1 \{Q_1\}\) \quad \(\{P_2\} C_2 \{Q_2\}\) \\
+        \midrule
+        \(\{P_1 * P_2\} C_1 \parallel C_2 \{Q_1 * Q_2\}\)
+    \end{tabular}
+    \caption{A separation logic rule for reasoning about the concurrent
+    execution of \(C_1\) and \(C_2\), denoted by \(\cdot \parallel \cdot\)
+    from~\cite{O_Hearn_2007}.}\label{F:CSL_ex}
+\end{figure}
 
 \subsection{Type of Supported Programming Languages}\label{S:t_pl}
 
 The supported languages are as varied as the programming language options
-available to today's programmer, from MLs~\cite{Coq}, Lisps and
+available to today's programmer, from MLs~\cite{Coq,Kumar_2014}, Lisps and
 Schemes~\cite{Torlak_2013} to object-oriented
-systems~\cite{leino2008specification,leino2010dafny} to bare-metal
+systems~\cite{leino2008specification,leino2010dafny} and bare-metal
 assembly~\cite{Chlipala_2011} on top of which further abstractions can be
 built~\cite{Chlipala_2015}. While this variety appears to present overwhelming
 choice to the programmer who wishes to verify a program, reality belies a
@@ -299,14 +358,13 @@ the existing languages.
 The systems programmer is apt to look more towards C and Rust like systems; this
 lends itself to a choice of tools like Bedrock~\cite{Chlipala_2011},
 \gls{vst}~\cite{VST}, and CompCert~\cite{Kastner-LBSSF-2017}, possibly paired
-with (concurrent) separation logic.
+with (concurrent) separation logic. Ynot~\cite{Nanevski08ynot:reasoning} is also
+an option for those comfortable with monadic reasoning and Hoare logic.
 
-The imperative programmer might look at Ynot~\cite{Nanevski08ynot:reasoning},
-though only if comfortable with monadic reasoning and Hoare logic.
-
-Programmers in ML-like languages have Coq and similar tools to choose from;
-Lispers and Schemers look to both relational-logic systems like
-Kanren~\cite{Byrd_2009} and automatic verifiers like Rosette.
+Programmers in ML-like languages have Coq~\cite{Coq}, CakeML~\cite{Kumar_2014},
+and similar tools to choose from; Lispers and Schemers look to both
+relational-logic systems like Kanren~\cite{Byrd_2009} and automatic verifiers
+like Rosette~\cite{Rosette}.
 
 For the unsatisfied, Rosette promises the ability to build automatic
 solver-aided languages suited to the problem at hand~\cite{Torlak_2013}. For
