@@ -278,7 +278,8 @@ be straightforward with \emph{only} these pre-conditions! The programmer may
 need to make logical leaps to strengthen conditions as necessary, particularly
 where complex algebraic reasoning is required.
 
-Formally, \(P\) is a weakest pre-condition with respect to \(C\) and \(Q\) iff
+Formally, \(P\) is a weakest pre-condition with respect to \(C\) and \(Q\) (\(P
+= \wpre{C,Q}\)) iff
 \begin{equation*}
     \{P\} C \{Q\} \text{ and } \forall P', \{P'\} C \{Q\} \implies (P' \TO P).
 \end{equation*}
