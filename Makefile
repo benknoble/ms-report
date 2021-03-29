@@ -28,7 +28,7 @@ thesis.pdf: thesis.tex setup.tex meta.tex macros.tex glossary.tex sources.bib
 thesis.pdf: abstract.tex
 thesis.pdf: intro.tex
 thesis.pdf: categories.tex
-# thesis.pdf: applications.tex
+thesis.pdf: examples.tex
 thesis.pdf: discussion.tex
 thesis.pdf: conclusion.tex
 

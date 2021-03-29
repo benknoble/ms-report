@@ -1,0 +1,51 @@
+\section{Learning by example}\label{S:examples}
+
+I begin with an extended example comparing two proofs of different systems in
+different verification environments (Section~\label{S:ex_ext}). I then briefly
+discuss a few other examples (Section~\label{S:ex_notable}) and point towards a
+plethora of other verified-programs research (Section~\label{S:ex_reading}).
+
+\subsection{Extended example: distributed hash-tables and regular
+expressions}\label{S:ex_ext}
+
+I have previously written two proofs of sufficient size and complexity that
+their study will demonstrate both common proof techniques and challenges. I will
+not provide all the details, in part because both were completed for academic
+exercises and I wish to avoid publishing full solutions, and in part because
+some details are not relevant for the discussion here (proof scripts and
+programs available on request). It is important to note that in both cases,
+there is no final executable program; rather, the proofs are written in a
+relational style. This facilitates the proof at the cost of not having a program
+to run. A final step would be to implement such programs and prove their
+agreement with the relational definition.
+
+The first proof is that a (somewhat idealized) distributed hash-table behaves
+like a logically-centralized hash-table; this was modeled and proved in
+Dafny~\cite{leino2010dafny} for the 2020 Systems Software Verification Summer
+School~\cite{Kapritsos_2020}. I defer details on hash-tables to classic texts
+like~\cite{CLRS}.
+
+The second proof is that the theory of regular expressions entails the strong
+pumping lemma; this was modeled and proved in Coq~\cite{Coq} for a course using
+the \emph{Logical Foundations} text~\cite{Pierce:SF1}. Details on regular
+expressions and the pumping lemma may be found
+in~\cite{Lewis_1997,Morrisett_2012}\footnote{Many details on the derivatives of
+regular expressions, also used in~\cite{Pierce:SF1,Morrisett_2012} but not
+relevant here, can be found in~\cite{Might_Yacc,Might_desugar,Might_deriv}}.
+
+I present the examples by following the chronology of their development. First,
+I develop a model of the theory. Second, I model the program to be verified.
+Third, I write down the formal specification. Finally, I prove by induction that
+the models implement the specification.
+
+\subsubsection{Model of the theory}
+
+\subsubsection{Model of the program}
+
+\subsubsection{Formal specification}
+
+\subsubsection{Proof by induction}
+
+\subsection{Notable mentions}\label{S:ex_notable}
+
+\subsection{Further reading}\label{S:ex_reading}
