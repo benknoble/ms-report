@@ -14,5 +14,5 @@
 *.acr
 *.alg
 *.ist
-defense.nav
-defense.snm
+*.fls
+*.fdb_latexmk
