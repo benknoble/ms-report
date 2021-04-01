@@ -146,25 +146,28 @@ to~\cite{Winskel_1993,Harper_2016} for introductions to program semantics.
 
 \begin{figure}
     \centering
-    \begin{tabular}{c}
-        E-APlus \\
-        \(e_1 \to n_1\) \quad \(e_2 \to n_2\) \\
-        \midrule
-        \(e_1 +_e e_2 \to n_1 + n_2\) \\
+    \begin{mathpar}
 
-        \\
+        \inference[\iname{E-APlus}]{%
+            \eval{\(e_1\)}{\sigma} = n_1 &
+            \eval{\(e_2\)}{\sigma} = n_2
+        }{\eval{\(e_1\) + \(e_2\)}{\sigma} = n_1 + n_2}
 
-        E-Seq \\
-        \((c_1, s_1) \To s_2\) \quad \((c_2, s_2) \To s_3\) \\
-        \midrule
-        \((c_1;c_2, s_1) \To s_3\)
-    \end{tabular}
+        \and
+
+        \inference[\iname{E-Seq}]{%
+            \comp{\(c_1\)}{\sigma_1} \DownTo \sigma_2 &
+            \comp{\(c_2\)}{\sigma_2} \DownTo \sigma_3 &
+        }{\comp{\(c_1\);\(c_2\)}{\sigma_1} \DownTo \sigma_3}
+
+    \end{mathpar}
     \caption{Sample inference rules for \texttt{Imp}, a simple imperative
-    language. E-APlus shows how to add two arithmetic expressions, where \(\to\)
-    means ``evaluates to.'' Similarly, E-Seq shows how to sequence two
-    statements \(c_1, c_2\), where \((c, s)\) represents a pair of a statement
-    and a state and \((c, s) \To s'\) means ``evaluating statement \(c\) in
-    state \(s\) produces the new state \(s'\).''}\label{F:Imp_ex}
+    language. \iname{E-APlus} shows how to add two arithmetic expressions, where
+    \(\eval{e}{\sigma} = x\) means ``evaluation of \(e\) under a state
+    \(\sigma\) produces \(x\).'' Similarly, \iname{E-Seq} shows how to sequence
+    two statements \(c_1, c_2\), where \(\comp{c}{\sigma} \DownTo \sigma'\)
+    means ``computing statement \(c\) in state \(\sigma\) produces the new state
+    \(\sigma'\).''}\label{F:Imp_ex}
 \end{figure}
 
 \subsubsection{Hoare Logic}
@@ -215,26 +218,27 @@ presented in \figurename~\ref{F:Hoare_ex}.
 
 \begin{figure}
     \centering
-    \begin{tabular}{c}
-        Hoare-Consequence-Pre \\
-        \(\{P'\} C \{Q\}\) \quad \(P \TO P'\) \\
-        \midrule
-        \(\{P\} C \{Q\}\) \\
+    \begin{mathpar}
 
-        \\
+        \inference[\iname{Hoare-Consequence-Pre}]{%
+            \{P'\} C \{Q\} & P \TO P'
+        }{\{P\} C \{Q\}}
 
-        Hoare-Seq \\
-        \(\{P\} C_1 \{Q\}\) \quad \(\{Q\} C_2 \{R\}\) \\
-        \midrule
-        \(\{P\} C_1;C_2 \{R\}\)
-    \end{tabular}
-    \caption{Two examples of the rules of Hoare logic. Hoare-Consequence-Pre
-    captures the notion that we can strengthen the pre-condition from \(P'\) to
-    \(P\) and still have a valid triple (\(\TO\) is analogous to implication,
-    with the definition \(\forall s: P s \implies P' s\)). Hoare-Seq provides an
-    analogue to E-Seq from \figurename~\ref{F:Imp_ex}. The programmer composes
-    rules like these rather than invoking the definition of a Hoare triple
-    whenever possible, using a higher level of abstraction.}\label{F:Hoare_ex}
+        \and
+
+        \inference[\iname{Hoare-Seq}]{%
+            \{P\} C_1 \{Q\} & \{Q\} C_2 \{R\}
+        }{\{P\} C_1;C_2 \{R\}}
+
+    \end{mathpar}
+    \caption{Two examples of the rules of Hoare logic.
+    \iname{Hoare-Consequence-Pre} captures the notion that we can strengthen the
+    pre-condition from \(P'\) to \(P\) and still have a valid triple (\(\TO\) is
+    analogous to implication, with the definition \(\forall s: P s \implies P'
+    s\)). \iname{Hoare-Seq} provides an analogue to \iname{E-Seq} from
+    \figurename~\ref{F:Imp_ex}. The programmer composes rules like these rather
+    than invoking the definition of a Hoare triple whenever possible, using a
+    higher level of abstraction.}\label{F:Hoare_ex}
 \end{figure}
 
 I should note that, while Hoare logics are mostly seen for imperative
@@ -332,11 +336,17 @@ from~\cite{O_Hearn_2007} is presented in \figurename~\ref{F:CSL_ex}.
 
 \begin{figure}
     \centering
-    \begin{tabular}{c}
-        \(\{P_1\} C_1 \{Q_1\}\) \quad \(\{P_2\} C_2 \{Q_2\}\) \\
-        \midrule
-        \(\{P_1 * P_2\} C_1 \parallel C_2 \{Q_1 * Q_2\}\)
-    \end{tabular}
+    \begin{mathpar}
+
+        \inference[\iname{Hoare-Par}]{%
+            \{P_1\} C_1 \{Q_1\} &
+            \{P_2\} C_2 \{Q_2\}
+        }{\{P_1 * P_2\} C_1 \parallel C_2 \{Q_1 * Q_2\}}
+
+        % fix centering (?)
+        \and
+
+    \end{mathpar}
     \caption{A separation logic rule for reasoning about the concurrent
     execution of \(C_1\) and \(C_2\), denoted by \(\cdot \parallel \cdot\)
     from~\cite{O_Hearn_2007}.}\label{F:CSL_ex}
