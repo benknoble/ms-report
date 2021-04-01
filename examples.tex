@@ -5,7 +5,7 @@ different verification environments (Section~\ref{S:ex_ext}). I then briefly
 discuss a few other examples (Section~\ref{S:ex_notable}) and point towards a
 plethora of other verified-programs research (Section~\ref{S:ex_reading}).
 
-\subsection{Extended example: distributed hash-tables and regular
+\subsection{Extended example: distributed hash tables and regular
 expressions}\label{S:ex_ext}
 
 I have previously written two proofs of sufficient size and complexity that
@@ -19,19 +19,19 @@ relational style. This facilitates the proof at the cost of not having a program
 to run. A final step would be to implement such programs and prove their
 agreement with the relational definition.
 
-The first proof is that a (somewhat idealized) distributed hash-table behaves
-like a logically-centralized hash-table; this was modeled and proved in
+The first proof is that a (somewhat idealized) distributed hash table behaves
+like a logically-centralized hash table; this was modeled and proved in
 Dafny~\cite{leino2010dafny} for the 2020 Systems Software Verification Summer
-School~\cite{Kapritsos_2020}. I defer details on hash-tables to classic texts
+School~\cite{Kapritsos_2020}. I defer details on hash tables to classic texts
 like~\cite{CLRS}.
 
-The second proof is that the theory of regular expressions entails the strong
-pumping lemma; this was modeled and proved in Coq~\cite{Coq} for a course using
-the \emph{Logical Foundations} text~\cite{Pierce:SF1}. Details on regular
-expressions and the pumping lemma may be found
-in~\cite{Lewis_1997,Morrisett_2012}\footnote{Many details on the derivatives of
-regular expressions, also used in~\cite{Pierce:SF1,Morrisett_2012} but not
-relevant here, can be found in~\cite{Might_Yacc,Might_desugar,Might_deriv}}.
+The second proof is that the theory of regular expressions and their derivatives
+correctly implements regular-expression matching; this was modeled and proved in
+Coq~\cite{Coq} for a course using the \emph{Logical Foundations}
+text~\cite{Pierce:SF1}. Details on regular expressions may be found
+in~\cite{Lewis_1997,Morrisett_2012}; details on the derivatives of regular
+expressions, also used in~\cite{Pierce:SF1,Morrisett_2012}, can be found
+in~\cite{Might_Yacc,Might_desugar,Might_deriv}.
 
 I present the examples by following the chronology of their development. First,
 I develop a model of the theory (Section~\ref{S:ex_theory}). Second, I model the
@@ -41,7 +41,107 @@ that the models implement the specification (Section~\ref{S:ex_ind}).
 
 \subsubsection{Model of the theory}\label{S:ex_theory}
 
+\paragraph{Hash table.} My theory of hash tables is to use a full Dafny map,
+specifically an infinite map from integers to integers. This means every
+possible integer key maps to a value; the default is 0. We specify two
+relations: the initial state and the possible transitions. This gives us an
+inductive state-machine to describe hash tables. The initial state is all keys
+map to 0. The possible transitions are the relations \(\func{Get}\) and
+\(\func{Put}\), each of which relate a current state to the next state:
+
+\begin{align*}
+    \func{Get}(\var{state}, \var{state'}, \var{key}, \var{value}) \definedas\;&
+    \var{state.table}[key] = value \\
+    & \land \var{state'} = \var{state} \\
+    \\
+    \func{Put}(\var{state}, \var{state'}, \var{key}, \var{value}) \definedas\;&
+    \var{state'.table} = \var{state.table}[key \gets value].
+\end{align*}
+
+Note that a \(\func{Get}\) leaves the state unchanged; this property will show
+up later in other models and is crucial to correctness. Without this statement,
+\(\var{state'}\) could be any possible state after a \(\func{Get}\).
+
+In Dafny, I also define
+\begin{inlist}
+\item a sum-type Step capturing the non-stateful parameters of the transitions
+    (here, \(\func{GetStep}\) and \(\func{PutStep}\) capture a key-value pair
+    for the \(\func{Get}\) and \(\func{Put}\) relations) and
+\item a relation \(\func{Next}\) that asserts the existence of some
+    \(\func{Step}\) value such the corresponding transition relation holds.
+\end{inlist}
+
+The key takeaway is the modelling of the problem-domain via an inductive
+state-machine and relations (or predicates) between possible states. Dafny has
+no direct support to indicate that the initial state predicate and the
+\(\func{Next}\) predicate form an induction principle; we would need to write a
+meta-theoretical proof for that. We can still structure the remaining proofs
+inductively and be confident in their correctness.
+
+\paragraph{Regular Expressions.} Coq supports the type of inductive relations
+I've used for hash tables; for the theory of regular expressions I will define
+what a regular expression is and how a string matches one. I define an inductive
+datatype \(\func{regexp}\), parameterized on the type \(T\) of strings, with the
+usual alternatives:
+
+\begin{align*}
+    \func{regexp}(T) \definedas\;
+    & |\; \emptyset \\
+    & |\; \epsilon \\
+    & |\; \func{Char}(t: T) \\
+    & |\; \func{App}(\var{left}: \func{regexp}(T), \var{right}: \func{regexp}(T)) \\
+    & |\; \func{Union}(\var{left}: \func{regexp}(T), \var{right}: \func{regexp}(T)) \\
+    & |\; \func{Star}(\var{re}: \func{regexp}(T)).
+\end{align*}
+
+I also need a theory of ``matching'': what does it mean for a string to match a
+regular expression? I write \(s \matches r\) for the assertion that a string
+\(s\) is a list of \(T\)s matching a regular-expression \(r\) over the type
+\(T\). At this point, there are several options. I could use a reference
+implementation and prove that my derivative matcher is equivalent; this requires
+that we have a reference implementation, and it still needs to be verified. I could
+construct finite automata and write proofs about graphs; according
+to~\cite{Morrisett_2012} graphs are unwieldy in Coq. Instead, I'll stick with
+induction and define the rules for matching as an inductive proposition:
+
+\begin{mathparpagebreakable}
+    \inference[\iname{MEmpty}]{}{[] \matches \epsilon}
+    \and
+    \inference[\iname{MChar}]{}{[x] \matches \func{Char}(x)}
+    \and
+    \inference[\iname{MApp}]{s_1 \matches r_1 & s_2 \matches r_2}
+    {s_1 \texttt{++} s_2 \matches \func{App}(r_1, r_2)}
+    \and
+    \inference[\iname{MUnionL}]{s_1 \matches r_1}{s_1 \matches \func{Union}(r_1, r_2)}
+    \and
+    \inference[\iname{MUnionR}]{s_1 \matches r_2}{s_1 \matches \func{Union}(r_1, r_2)}
+    \and
+    \inference[\iname{MStar0}]{}{[] \matches \func{Star}(r)}
+    \and
+    \inference[\iname{MStarApp}]{s_1 \matches r & s_2 \matches \func{Star}(r)}
+    {s_1 \texttt{++} s_2 \matches \func{Star}(r)}.
+\end{mathparpagebreakable}
+
+Because these are inductive definitions, Coq automatically generates induction
+principles for use in proofs. Thus I define the problem-domain inductively,
+again.
+
+These definitions can be read analogously to the relational predicates
+describing transitions in the hash table state-machine. We can use these rules
+to construct proofs that a string matches a regular expression; the only way to
+extend these rules is to prove a theorem about the matching relation. Because
+Coq is constructive, such a proof will necessarily involve the use of these
+rules or another such theorem---unfolded, all proofs about \(\matches\) are built
+on these rules and the standard rules of Coq's logic.
+
+The inductive construction turns out to be a good pattern for verified programs;
+only the simplest programs make use of purely finite types (\eg, booleans) and
+can be verified with a finite case analysis. Most interesting programs require
+reasoning by induction to handle the infinite.
+
 \subsubsection{Model of the program}\label{S:ex_program}
+
+
 
 \subsubsection{Formal specification}\label{S:ex_spec}
 
