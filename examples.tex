@@ -642,43 +642,54 @@ in the excerpts below.
 One useful feature of Coq, particularly in the proof of correctness of
 \(\func{D}\), is the interactive state. As a rather verbose example that also
 demonstrates the rewrite-under-existential issue above, I show a sample from the
-correctness proof of \(\func{D}\) in the \(\func{App}\) case. Note how Coq shows
-the goals to prove and the hypotheses and variables in the current context. (One
-might wish to use \texttt{IHre1} in a few goals below, but the relevant terms
-are stuck under \texttt{exists}.) In this state, I can focus on a particular
-subgoal and its associated context and see explicitly all of the proof state.
+correctness proof of \(\func{D}\) in the \(\func{App}\) case in
+\figurename~\ref{F:r_derive}. Note how Coq shows the goals to prove and the
+hypotheses and variables in the current context. (One might wish to use
+\texttt{IHre1} in a few goals below, but the relevant terms are stuck under
+\texttt{exists}.) In this state, I can focus on a particular subgoal and its
+associated context and see explicitly all of the proof state.
 
+\begin{figure}
 \begin{verbatim}
 4 subgoals
 (2 unfocused at this level)
 
 re1, re2 : reg_exp ascii
-IHre1 : forall (s : list ascii) (a : ascii), a :: s =~ re1 <-> s =~ derive a re1
-IHre2 : forall (s : list ascii) (a : ascii), a :: s =~ re2 <-> s =~ derive a re2
+IHre1 : forall (s : list ascii) (a : ascii),
+        a :: s =~ re1 <-> s =~ derive a re1
+IHre2 : forall (s : list ascii) (a : ascii),
+        a :: s =~ re2 <-> s =~ derive a re2
 s : list ascii
 a : ascii
 H : ([ ] =~ re1) /\ s =~ derive a re2
 
 ========================= (1 / 4)
 
-(exists s0 s1 : list ascii, s = s0 ++ s1 /\ (s0 =~ derive a re1) /\ s1 =~ re2)
+(exists s0 s1 : list ascii, s = s0 ++ s1
+                        /\ (s0 =~ derive a re1) /\ s1 =~ re2)
 \/ s =~ (if match_eps re1 then derive a re2 else EmptySet)
 
 ========================= (2 / 4)
 
-(exists s0 s1 : list ascii, s = s0 ++ s1 /\ (s0 =~ derive a re1) /\ s1 =~ re2)
+(exists s0 s1 : list ascii, s = s0 ++ s1
+                        /\ (s0 =~ derive a re1) /\ s1 =~ re2)
 \/ s =~ (if match_eps re1 then derive a re2 else EmptySet)
 
 ========================= (3 / 4)
 
 ([ ] =~ re1) /\ s =~ derive a re2
-\/ (exists s0 s1 : list ascii, s = s0 ++ s1 /\ (a :: s0 =~ re1) /\ s1 =~ re2)
+\/ (exists s0 s1 : list ascii, s = s0 ++ s1
+                           /\ (a :: s0 =~ re1) /\ s1 =~ re2)
 
 ========================= (4 / 4)
 
 ([ ] =~ re1) /\ s =~ derive a re2
-\/ (exists s0 s1 : list ascii, s = s0 ++ s1 /\ (a :: s0 =~ re1) /\ s1 =~ re2)
+\/ (exists s0 s1 : list ascii, s = s0 ++ s1
+                           /\ (a :: s0 =~ re1) /\ s1 =~ re2)
 \end{verbatim}
+    \caption{Selected output from the interactive proof of
+    Lemma~\ref{Lem:r_derive}.}\label{F:r_derive}
+\end{figure}
 
 In the first goal, for example, I can proceed on the cases of our
 \(\func{Empty}\) reflection lemma: either \(\func{Empty}(\var{re_1})\) is true
@@ -688,27 +699,37 @@ case the right side of the disjunct follows by the right side of the conjunct
 \matches \var{re_1}\) but case analysis said \([] \not\matches \var{re_1}\)
 since \(\func{Empty}(\var{re_1})\) is false.
 
-In the second goal, \texttt{H} will be different, as shown (after opting to
-prove the left side of the conjunct):
+In the second goal, \texttt{H} will be different, as shown in
+\figurename~\ref{F:r_derive2}. I can use this version to obtain witness for the
+existential claim on the left of the goal, and reason with \texttt{IHre1} to
+finish the conclusion. I cannot, however, use \texttt{IHre1} directly in the
+state shown, even though it would make the claim in \texttt{H} equivalent to the
+goal.
+
+\begin{figure}
 \begin{verbatim}
 1 subgoal
 (2 unfocused at this level)
 
 re1, re2 : reg_exp ascii
-IHre1 : forall (s : list ascii) (a : ascii), a :: s =~ re1 <-> s =~ derive a re1
-IHre2 : forall (s : list ascii) (a : ascii), a :: s =~ re2 <-> s =~ derive a re2
+IHre1 : forall (s : list ascii) (a : ascii),
+        a :: s =~ re1 <-> s =~ derive a re1
+IHre2 : forall (s : list ascii) (a : ascii),
+        a :: s =~ re2 <-> s =~ derive a re2
 s : list ascii
 a : ascii
-H : exists s0 s1 : list ascii, s = s0 ++ s1 /\ (a :: s0 =~ re1) /\ s1 =~ re2
+H : exists s0 s1 : list ascii, s = s0 ++ s1
+                            /\ (a :: s0 =~ re1) /\ s1 =~ re2
 
 ========================= (1 / 1)
 
-exists s0 s1 : list ascii, s = s0 ++ s1 /\ (s0 =~ derive a re1) /\ s1 =~ re2
+exists s0 s1 : list ascii, s = s0 ++ s1
+                        /\ (s0 =~ derive a re1) /\ s1 =~ re2
 \end{verbatim}
-I can use this version to obtain witness for the existential claim on the left
-of the goal, and reason with \texttt{IHre1} to finish the conclusion. I cannot,
-however, use \texttt{IHre1} directly in the state shown, even though it would
-make the claim in \texttt{H} equivalent to the goal.
+\caption{Selected output from the interactive proof of Lemma~\ref{Lem:r_derive},
+    after opting to prove the left side of the conjunct in one
+    subgoal.}\label{F:r_derive2}
+\end{figure}
 
 This concludes our short tour of Coq via regular expressions. We saw how to
 model data and logical propositions inductively, how to build up functional
@@ -725,5 +746,66 @@ Coq. We continue with a few brief examples of other research that exposes
 similar techniques and challenges before leaving a variety of other references.
 
 \subsection{Notable mentions}\label{S:ex_notable}
+
+In this section I will briefly highlight research in verified programs that is
+particularly relevant to the insights gained from the previous examples. It will
+also introduce some of the open problems to be examined in
+Section~\ref{S:discussion}.
+
+\paragraph{RockSalt.} The RockSalt project formally verified a safety-checker
+for Google's Native Client in Coq~\cite{Morrisett_2012}. Due to the challenges
+in proofs about program translation and specifically proofs about x86 assembly,
+the authors decided instead to build and prove correct a software-fault
+isolation checker that they claim is smaller and faster than Google's original.
+Key components of their development include one of the first formal models of a
+large subset of x86, a DSL to specify and automatically analyze architecture
+semantics, and a framework for validating models against existing x86
+implementations. The DSL is based largely on grammars, regular expressions, and
+the derivatives we saw in the extended example. They also model
+non-deterministic register-transfer language which they convert to an
+interpretable function by means of an oracle---this enables the extraction of
+executable code. They consider several model-validation approaches, including
+generated programs using \texttt{CSmith} and \texttt{GCC}, which may miss
+instructions not used by compilers, and fuzz-testing based on the grammar, which
+can capture all instructions included in the grammar. Some unresolved questions
+the authors raise include
+\begin{itemize}
+    \item Formally modeling x86 is difficult: how can we handle concurrency?
+    \item Can we embed the DSL in other proof-assistants to arrive at portable
+        specifications?
+    \item Can we close the gap and verify the C implementation of the checker
+        and compile it with CompCert~\cite{Leroy-Compcert-CACM}?
+    \item Can we build more advanced checkers?
+    \item Reasoning about bit-vectors is more tedious in Coq than in an
+        \gls{smt} solver; how can we improve this?
+    \item How can we effectively handle case-analysis on 100s of cases? There is
+        a need for more automated and robust proof techniques.
+\end{itemize}
+
+\paragraph{RustBelt.} The RustBelt project has proven the Rust programming
+language's safety guarantees~\cite{Jung_2018a,Jung_2021}. The core of their
+arguments rely on inductive judgements like we saw in the extended example,
+formalized in Iris~\cite{Jung_2018b} on top of Coq, in order to prove that if a
+Rust program that does not use \texttt{unsafe} type-checks, it is indeed safe.
+They further demonstrated the conditions necessary for any given \texttt{unsafe}
+code to be safe, and proved several facts about the Rust standard library's
+\texttt{unsafe} usage, including the discovery of a few bugs. The proof is thus
+extendable: the whole program is safe if all the \texttt{unsafe} pieces are
+safe. They extended concurrent separation logic to handle Rust's lifetimes,
+adapting the spatial reasoning technique to temporal reasoning. There are a few
+pieces of the Rust language missing, \eg, traits and \texttt{drop} destructors,
+but the work brings new confidence to the safety of Rust.
+
+I cannot mention RustBelt without also mentioning the significant work that has
+been put into Iris~\cite{Jung_2015,Jung_2016,Krebbers_2017a,Jung_2018b}. The
+team has managed to distill many of the different concurrent separation logics
+(recall \figurename~\ref{F:iris_complex}) into a ``raw'' form from which they
+may be derived, just like lifetime logic was derived for RustBelt.
+
+\paragraph{Rosette.}
+
+\paragraph{CompCert.}
+
+%TODO sticky notes
 
 \subsection{Further reading}\label{S:ex_reading}
