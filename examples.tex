@@ -403,15 +403,29 @@ correctly implement matching; that is, \(\func{Match}(s, r)\) should be
 boolean and the matches relation is a proposition, which is in general
 undecidable. The two are not directly compatible with connectives like \(\iff\);
 that is, we cannot right \(\forall s, r: \func{Match}(s, r) \iff s \matches r\)
-as our specification. I could instead use the proposition \(\func{Match}(s,
-r) = \true\), but I choose to use a technique called ``proof by
-reflection.'' The idea is that some propositions are in fact decidable; as a
-witness, we provide a predicate that computes the truth-value. The predicate is
-said to \emph{reflect} the proposition. I will write \(b \reflects P\) in these
-cases; note that implicitly \(\neg b \reflects \neg P\). To prove such a claim,
-we must show that in each possible case of the computation of \(b\), the
-proposition \(P\) is provable or derives a contradiction. We are able to make
-use of the (proved) fact that \(b \reflects P \equiv b = true \iff P\).
+as our specification. I could instead use the proposition \(\func{Match}(s, r) =
+\true\), but I choose to use a technique called ``proof by reflection.'' The
+idea is that some propositions are in fact decidable; as a witness, we provide a
+predicate that computes the truth-value. The predicate is said to \emph{reflect}
+the proposition. I will write \(b \reflects P\) in these cases; note that
+implicitly \(\neg b \reflects \neg P\). To prove such a claim, we must show that
+in each possible case of the computation of \(b\), the proposition \(P\) is
+provable or derives a contradiction. We are able to make use of the (proved)
+fact that \(b \reflects P \equiv b = true \iff P\). Proof by reflection is a
+common and powerful technique for relating predicates to propositions and for
+doing case-analysis over propositions in logics without the law of excluded
+middle\footnote{The LEM states \(\forall P, P \lor \neg P\). This is not assumed
+by Coq as Coq uses a constructive logic. It is possible to add the axiom;
+however, this has the effect of changing the logic in a subtle way.}. The rules
+of reflection are succinctly stated:
+\begin{mathpar}
+    \inference[\iname{Reflect-T}]{P}{\true \reflects P} \and
+    \inference[\iname{Reflect-F}]{\neg P}{\false \reflects P}
+\end{mathpar}
+With a reflection relation proven, we can analyze the two cases: either the
+witness function computes true or false. In addition, we are given information
+about \(P\) or \(\neg P\) which we can use to reason with the usual connectives
+and tactics.
 
 Thus we state our proof obligation:
 \begin{thm}[Match correctness]\label{Th:r_match}
@@ -436,18 +450,6 @@ correctness theorem for \(\func{D}\) is stated as:
     For all characters \(a\) and regular expressions \(r\), we have
     \(\Delta(r, a, \func{D}_a(r))\).
 \end{lem}
-
-Proof by reflection is a common and powerful technique for relating predicates
-to propositions and for doing case-analysis over propositions in logics without
-the law of excluded middle\footnote{The LEM states \(\forall P, P \lor \neg P\).
-This is not assumed by Coq as Coq uses a constructive logic. It is possible to
-add the axiom; however, this has the effect of changing the logic in a subtle
-way.}. The rules of reflection are succinctly stated:
-
-\begin{mathpar}
-    \inference[\iname{Reflect-T}]{P}{\true \reflects P} \and
-    \inference[\iname{Reflect-F}]{\neg P}{\false \reflects P}
-\end{mathpar}
 
 In this example we also need auxiliary correctness statements; we will see
 analogues in the hash-table proof. The difference is that, from our development
