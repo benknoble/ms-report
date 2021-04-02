@@ -1,5 +1,7 @@
 \section{Learning by example}\label{S:examples}
 
+% TODO I/we and tenses are all over the place
+
 I begin with an extended example comparing two proofs of different systems in
 different verification environments (Section~\ref{S:ex_ext}). I then briefly
 discuss a few other examples (Section~\ref{S:ex_notable}) and point towards a
@@ -460,12 +462,12 @@ complete the proof.
 Finally we come to the proofs. I will omit the details and focus on a few key
 ideas.
 
-In the case of the hash table proof, we are interested in the following:
-first, Dafny can automatically prove some lemmas and fill in some details
-in theorems. This avoids some tedium, at the cost of hiding the exact proof
-state. Second, Dafny suffers from a ``timeout demon'' due to the use of an
-\gls{smt} solver. This leads to some challenges in large proof developments.
-Lastly, proof development in Dafny follows a sort of 20-questions style.
+In the case of the hash table proof, we are interested in the following: first,
+Dafny can automatically prove some lemmas and fill in some details in theorems.
+This avoids some tedium, at the cost of hiding the exact proof state. Second,
+proof development in Dafny follows a sort of 20-questions style. Lastly, Dafny
+suffers from a ``timeout demon'' due to the use of an \gls{smt} solver. This
+leads to some challenges in large proof developments.
 
 In the case of regular expressions, we are interested in the following: first,
 there is a clever technique of relating relating our inductive judgements to
@@ -477,7 +479,97 @@ entirely interactive, so that I know exactly what context I am in and what the
 goals are at any time. This can make it easier to reason about complex state, as
 I am not guessing what the system looks like.
 
-\paragraph{Hash table.}
+\paragraph{Hash table.} Looking at our two proof obligations,
+Theorem~\ref{Th:h_init} seems the easier of the two: we need to prove that
+\(\func{Init}_{D}\) is correct with respect to \(\func{Init}_{S}\) and that it
+establishes the invariants (disjointness and fullness). After I write the
+statement of the theorem, Dafny asks for a proof. I first let it attempt to fill
+in the details, leaving the body blank; Dafny complains that the two
+post-conditions (correctness and the invariants) may not hold. This is Dafny's
+way of telling me that it can't work out all the details. By examining the
+definition of \(\func{Init}_{S}\), I know I need to first show that \(I\) maps
+the initial distributed state to the initial single state. Logically, I know
+that one host contains the full 0-table, and the other hosts' tables are empty,
+so they shouldn't contribute to the result. I also know there is nothing on the
+network. I ask Dafny: if I can prove these few facts, will you believe
+correctness of \(\func{Init}\)? To do so, I \texttt{assert} the following facts
+without proof:
+\begin{itemize}
+    \item the host with id 0 contains a table mapping all keys to 0;
+    \item any host with id not 0 contains an empty table;
+    \item the table-union of a non-empty table and any number of other empty
+        tables is the non-empty table;
+    \item there are no messages on the network; and therefore
+    \item \(I\) maps the initial distributed state to the initial single state
+        by considering a table-union of a single full 0-table with empty-tables.
+\end{itemize}
+Indeed, at this point, Dafny no longer complains that the \(\func{Init}_{S}\)
+post-condition cannot be established. However, it does flag some (not all!) of
+the assertions as not established. In other words, if I can prove the remaining
+assertions, I will have successfully given Dafny enough to finish part of the
+proof. Dafny observes on its own all of the facts except that empty tables do
+not contribute to a table-union. I state this as a separate lemma and play
+another round of 20-questions with Dafny: what will it take to convince you?
+Briefly, I am able to complete the proof via an inductive structure that mimics
+the recursive nature of the table-union function---I am able to invoke the lemma
+I am proving in the recursive case, much like a recursive function call. An
+important auxiliary lemma in the proof is that the table-union of empty tables
+is also empty: this has no proof body, for Dafny can observe its truth entirely
+automatically. I still need to show the invariants, but fullness follows from
+the establishment of \(\func{Init}_{S}\), and the tables are also clearly
+disjoint by similar reasoning; Dafny fills in most of these details for me.
+
+The proof of Theorem~\ref{Th:h_ind} is similar in many respects: I ask Dafny if
+it can prove the required definitions automatically; where it cannot, I start
+unfolding definitions and \texttt{assert}ing facts until Dafny has enough
+information. Then, I supply proofs for the assertions. I also have to reason by
+case-analysis on the possible steps for the distributed system (recall from
+Section~\ref{S:ex_program} the steps \(\func{Get}\), \(\func{Put}\),
+\(\func{Send}\), and \(\func{Receive}\)). Some cases require more details then
+others; I wind up needing auxiliary statements like ``if all the tables are
+disjoint, then the table that owns the key controls the value that the key maps
+to in the table-union'' and ``the invariants disjointness and fullness imply
+that the union is also full'' (both of which Dafny fills in almost
+automatically). Similarly, with little assistance Dafny can see that a
+\(\func{Put}\) step keeps full maps full. However, as the proof starts to get
+larger, and the more complicated details are filled in, Dafny's checker gets
+slower and slower. It eventually grinds to a halt---I, the programmer,
+am left with a tool that should be mostly automatic but has effectively stopped
+its dialogue with me. What went wrong?
+
+By limiting the time spent per proof, I identify that I am stuck in Dafny's
+``timeout demon.'' A full tutorial on profiling Dafny execution to identify the
+source of the timeout is out of scope; see~\cite{Kapritsos_2020} for details.
+The source of the demon is related to the way Dafny and its underlying engine
+and solver unfold definitions and attempt to use them. In this case, two
+different definitions make trouble: disjointness and fullness. Let's examine
+their definitions:
+\begin{align*}
+    \func{Disjoint}(\var{tables}) &\definedas \forall t_1, t_2 \in \var{tables}:
+    t_1 \neq t_2 \implies \func{Keys}(t_1) \intersect \func{Keys}(t_2) = \emptyset
+    \\ \text{and} \\
+    \func{Full}(\var{tables}) &\definedas \forall \var{key} : \exists t \in
+    \var{tables} : \var{key} \in t.
+\end{align*}
+In the case of disjointness, Dafny might try to apply the definition anywhere
+there are tables to make progress; unfortunately, there are lots of tables in
+the proofs, so this leads to an explosion of applications that make little
+progress. In the case of fullness, Dafny struggles to resolve the
+universal-existential pair, leading to similar explosions or slowdowns. The
+resolution in both cases is to mark the definitions \texttt{\{:opaque\}}, an
+annotation that prevents Dafny from unfolding the definitions except when
+explicitly \texttt{reveal}ed---this gives the programmer more control over the
+scope of the definitions, but closes off an avenue of automation. Now, I have to
+rework previously acceptable proofs to reveal definitions at the key steps so
+that Dafny can see I have satisfied them. When filling in these details, as
+before, I am not shown the exact proof state, and have to continue parts of the
+20-questions game.
+
+This concludes our short tour of Dafny via distributed hash tables. We saw how
+to model inductive state machines for both theoretical and practical models, how
+to state correctness criteria for an inductive proposition, and how to use
+Dafny's auto-active features to assist proof-development. We also saw the cost
+of that auto-activity in the ``timeout demon'' and the lack of visible context.
 
 \paragraph{Regular Expressions.} Let's first examine the proof of
 \(\func{Match}\) correctness. Lemmas~\ref{Lem:r_empty} and~\ref{Lem:r_derive}
@@ -514,8 +606,38 @@ These propositions end up being more amenable to use with the induction
 hypotheses. However, we run into trouble with \(\func{App}\) and
 \(\func{Star}\). Their logical equivalents involve the use of the existential
 quantifier; Coq's constructive logic requires us to give a witness to complete
-the proof. This prevents us from performing certain obvious rewrites that in
-other situations would make the proof simpler.
+the proof.
+\begin{lem}
+    For all strings \(s\) and regular expressions \(\var{left}, \var{right}\),
+    we have
+    \begin{mathpar}
+        s \matches \func{App}(\var{left}, \var{right}) \\
+        \iff \\
+        \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches \var{left} \land s_1 \matches \var{right}
+    \end{mathpar}
+\end{lem}
+\begin{lem}
+    For all strings \(a + s\) and regular expressions \(\var{left}, \var{right}\),
+    we have
+    \begin{mathpar}
+        a + s \matches \func{App}(\var{left}, \var{right}) \\
+        \iff \\
+        [] \matches \var{left} \land a + s \matches \var{right} \\
+        \lor \\
+        \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land a + s_0 \matches \var{left} \land s_1 \matches \var{right}
+    \end{mathpar}
+\end{lem}
+\begin{lem}
+    For all strings \(a + s\) and regular expressions \(r\), we have
+    \begin{mathpar}
+        a + s \matches \func{Star}(r) \\
+        \iff \\
+        \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches r \land s_1 \matches \func{Star}(r)
+    \end{mathpar}
+\end{lem}
+This prevents us from performing certain obvious rewrites that in
+other situations would make the proof simpler. The issue is further demonstrated
+in the excerpts below.
 
 One useful feature of Coq, particularly in the proof of correctness of
 \(\func{D}\), is the interactive state. As a rather verbose example that also
@@ -568,7 +690,6 @@ since \(\func{Empty}(\var{re_1})\) is false.
 
 In the second goal, \texttt{H} will be different, as shown (after opting to
 prove the left side of the conjunct):
-
 \begin{verbatim}
 1 subgoal
 (2 unfocused at this level)
@@ -584,11 +705,18 @@ H : exists s0 s1 : list ascii, s = s0 ++ s1 /\ (a :: s0 =~ re1) /\ s1 =~ re2
 
 exists s0 s1 : list ascii, s = s0 ++ s1 /\ (s0 =~ derive a re1) /\ s1 =~ re2
 \end{verbatim}
-
 I can use this version to obtain witness for the existential claim on the left
 of the goal, and reason with \texttt{IHre1} to finish the conclusion. I cannot,
 however, use \texttt{IHre1} directly in the state shown, even though it would
 make the claim in \texttt{H} equivalent to the goal.
+
+This concludes our short tour of Coq via regular expressions. We saw how to
+model data and logical propositions inductively, how to build up functional
+programs and identify possible proof strategies based on recursion, how to state
+correctness in terms of reflection, and how to use and manipulate the proof
+context. We also saw the utility of reasoning in traditional logical mechanisms
+and converting between the two, as well as the difficulties of reasoning under
+existential quantifiers.
 
 By examining these two extended examples, we have seen techniques and challenges
 common to program verification. We have also seen some useful features of two
