@@ -442,10 +442,10 @@ correctness theorem for \(\func{Empty}\) is simple:
 
 For the derivative, we need to formalize what it means to be a derivative. I
 define the relation \(\Delta\) between two regular expressions \(r\) and \(r'\)
-with respect to character \(a\) as for all strings \(s\), \(\forall s: a+s
-\matches r \iff s \matches r'\). That is, \(\Delta(r, a, r')\) is provable
-exactly when \(r'\) is the derivative of \(r\) with respect to \(a\). Then the
-correctness theorem for \(\func{D}\) is stated as:
+with respect to character \(a\) as for all strings \(s\), \(a+s \matches r \iff
+s \matches r'\). That is, \(\Delta(r, a, r')\) is provable exactly when \(r'\)
+is the derivative of \(r\) with respect to \(a\). Then the correctness theorem
+for \(\func{D}\) is stated as:
 \begin{lem}[Derivative correctness]\label{Lem:r_derive}
     For all characters \(a\) and regular expressions \(r\), we have
     \(\Delta(r, a, \func{D}_a(r))\).
