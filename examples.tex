@@ -598,7 +598,7 @@ We often need to show these statements by induction, but the only interesting
 cases are when the overall regular expression is of the type we care about. With
 Coq's automation\footnote{A full overview is out of scope. The Coq manual,
 accessible from the Coq homepage~\cite{Coq}, explains how to use the automation
-language Ltac as well as automation tacticals.}, we can automatically discard
+language Ltac as well as automation tacticals.} we can automatically discard
 all the other cases and focus on just the details of the particular case (this
 is particular useful in the cases for \(\func{Star}\)).
 
@@ -637,16 +637,16 @@ the proof.
 \end{lem}
 This prevents us from performing certain obvious rewrites that in
 other situations would make the proof simpler. The issue is further demonstrated
-in the excerpts below.
+in the excerpts in \figurename~\ref{F:r_derive}.
 
 One useful feature of Coq, particularly in the proof of correctness of
 \(\func{D}\), is the interactive state. As a rather verbose example that also
 demonstrates the rewrite-under-existential issue above, I show a sample from the
 correctness proof of \(\func{D}\) in the \(\func{App}\) case in
 \figurename~\ref{F:r_derive}. Note how Coq shows the goals to prove and the
-hypotheses and variables in the current context. (One might wish to use
-\texttt{IHre1} in a few goals below, but the relevant terms are stuck under
-\texttt{exists}.) In this state, I can focus on a particular subgoal and its
+hypotheses and variables in the current context. One might wish to use
+\texttt{IHre1} in a few of the goals, but the relevant terms are stuck under
+\texttt{exists}. In this state, I can focus on a particular subgoal and its
 associated context and see explicitly all of the proof state.
 
 \begin{figure}
@@ -700,8 +700,8 @@ case the right side of the disjunct follows by the right side of the conjunct
 since \(\func{Empty}(\var{re_1})\) is false.
 
 In the second goal, \texttt{H} will be different, as shown in
-\figurename~\ref{F:r_derive2}. I can use this version to obtain witness for the
-existential claim on the left of the goal, and reason with \texttt{IHre1} to
+\figurename~\ref{F:r_derive2}. I can use this version to obtain witnesses for
+the existential claim on the left of the goal, and reason with \texttt{IHre1} to
 finish the conclusion. I cannot, however, use \texttt{IHre1} directly in the
 state shown, even though it would make the claim in \texttt{H} equivalent to the
 goal.
@@ -743,7 +743,8 @@ By examining these two extended examples, we have seen techniques and challenges
 common to program verification. We have also seen some useful features of two
 different styles of verifiers; namely, the auto-active Dafny and the interactive
 Coq. We continue with a few brief examples of other research that exposes
-similar techniques and challenges before leaving a variety of other references.
+similar techniques and challenges before providing a variety of other
+references.
 
 \subsection{Notable mentions}\label{S:ex_notable}
 
