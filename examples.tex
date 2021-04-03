@@ -22,7 +22,7 @@ to run. A final step would be to implement the full programs and prove its
 agreement with the relational definition.
 
 The first proof is that a (somewhat idealized) distributed hash table behaves
-like a logically-centralized hash table; this was modeled and proved in
+like a logically centralized hash table; this was modeled and proved in
 Dafny~\cite{leino2010dafny} for the 2020 Systems Software Verification Summer
 School~\cite{Kapritsos_2020}. I defer details on hash tables to classic texts
 like~\cite{CLRS}. This proof has no final executable.
@@ -608,16 +608,17 @@ These propositions end up being more amenable to use with the induction
 hypotheses. However, we run into trouble with \(\func{App}\) and
 \(\func{Star}\). Their logical equivalents involve the use of the existential
 quantifier; Coq's constructive logic requires us to give a witness to complete
-the proof.
-\begin{lem}
-    For all strings \(s\) and regular expressions \(\var{left}, \var{right}\),
-    we have
-    \begin{mathpar}
-        s \matches \func{App}(\var{left}, \var{right}) \\
-        \iff \\
-        \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches \var{left} \land s_1 \matches \var{right}
-    \end{mathpar}
-\end{lem}
+the proof. As an example, I give the lemma for \(\func{App}\) with a non-empty
+string.
+% \begin{lem}
+%     For all strings \(s\) and regular expressions \(\var{left}, \var{right}\),
+%     we have
+%     \begin{mathpar}
+%         s \matches \func{App}(\var{left}, \var{right}) \\
+%         \iff \\
+%         \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches \var{left} \land s_1 \matches \var{right}
+%     \end{mathpar}
+% \end{lem}
 \begin{lem}
     For all strings \(a + s\) and regular expressions \(\var{left}, \var{right}\),
     we have
@@ -629,14 +630,14 @@ the proof.
         \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land a + s_0 \matches \var{left} \land s_1 \matches \var{right}
     \end{mathpar}
 \end{lem}
-\begin{lem}
-    For all strings \(a + s\) and regular expressions \(r\), we have
-    \begin{mathpar}
-        a + s \matches \func{Star}(r) \\
-        \iff \\
-        \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches r \land s_1 \matches \func{Star}(r)
-    \end{mathpar}
-\end{lem}
+% \begin{lem}
+%     For all strings \(a + s\) and regular expressions \(r\), we have
+%     \begin{mathpar}
+%         a + s \matches \func{Star}(r) \\
+%         \iff \\
+%         \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches r \land s_1 \matches \func{Star}(r)
+%     \end{mathpar}
+% \end{lem}
 This prevents us from performing certain obvious rewrites that in
 other situations would make the proof simpler. The issue is further demonstrated
 in the excerpts in \figurename~\ref{F:r_derive}.
@@ -805,10 +806,124 @@ team has managed to distill many of the different concurrent separation logics
 (recall \figurename~\ref{F:iris_complex}) into a ``raw'' form from which they
 may be derived, just like lifetime logic was derived for RustBelt.
 
-\paragraph{Rosette.}
+\paragraph{Rosette.} Rosette~\cite{Rosette,Torlak_2013} is a language for
+building verified languages. That is, in the tradition of Racket, Rosette
+enables the creation of new solver-aided languages; like Dafny, Rosette employs
+a \gls{smt} solver for automation. Rosette is completely automatic, however, and
+enables queries beyond ``is this program correct?'' The solvers automate
+program synthesis, verification, bug location, and program repair via a novel
+technique called \emph{partial evaluation}. This enables Rosette to be designed
+around a small core while programmers and languages can use advanced
+features---the higher-level code is partially evaluated away into the smaller
+core. This helps remove artificial finitization of programs, which is progress
+over traditional bounded-reasoning for automatic verifiers. The work on
+synthesis is also reminiscent of work on relational
+interpreters~\cite{Byrd_2012}. Related work stemming from Rosette has addressed
+challenges such as symbolic execution with types~\cite{Chang_2018} and virtual
+machines~\cite{Torlak_2014}. Most recently the team has explored the
+profiling~\cite{Bornholt_2018} and fixing~\cite{Porncharoenwase_2020} of code
+that explodes under symbolic evaluation (recall our trouble with Dafny's timeout
+demon).
 
-\paragraph{CompCert.}
+\paragraph{CompCert.} The CompCert
+project~\cite{Leroy-Compcert-CACM,Leroy-BKSPF-2016,Kastner-LBSSF-2017} develops
+a multi-pass, optimizing, verified C compiler for MISRA-C 2004 (almost all of
+ISO C99 is supported). The authors argue that miscompilation is a serious risk,
+especially in safety-critical environments---it can invalidate verification
+of the program, as the running executable may not be faithful to the verified
+program. As of the \citeyear{Kastner-LBSSF-2017} paper, CompCert supports
+separate compilation, DWARF debugging information, formal annotations at the C
+and assembly level, equivalence checks between the assembly output and the
+executable program (part of a translation validation process), and several
+processor architectures. CompCert also comes equipped with a reference
+interpreter for model-checking, a verified parser (not part of the original
+\citeyear{Leroy-Compcert-CACM} development), and is competitive with all but the
+highest \texttt{GCC} optimization levels. The CompCert development presents two
+useful insights: first, they structure their proof by induction, but the
+correctness criteria are similar to the hash table proof above, examining
+potential executions for comparison. Second, they mention several ongoing
+challenges related to extraction of verified programs like compilers, as well as
+challenges specific to compilation and linking.
 
-%TODO sticky notes
+Recall from the hash table example that the distributed system was correct if
+its state machine transitions were comparable to transitions in the single hash
+table, with the addition of the stutter step. CompCert, in order to account for
+the degrees of freedom given to a C compiler writer (\eg, non-deterministic
+order of evaluation, optimizations), similarly weakens the preservation of exact
+comparison of observable behaviors and instead considers correctness of safe
+programs. The property they are particularly interested in is that behaviors of
+compiled safe programs are permitted behaviors of the source
+program~\cite[Section~2.1]{Leroy-Compcert-CACM}. They also consider
+\emph{traces} of observable behavior in their implementation and
+proofs~\cite{Kastner-LBSSF-2017} as well as other possible approaches (\eg,
+translation validation and proof-carrying
+code)~\cite[Section~2.2]{Leroy-Compcert-CACM}.
+
+CompCert is a program written in Coq; therefore, to execute it, it must be
+extracted to a different language. This presents a challenge similar to the one
+CompCert is trying to solve---how do you trust the extraction mechanism? It is
+desirable to provide and verify an alternative extraction mechanism (\eg, to C)
+which can thus be used for bootstrapping the compiler in a completely verified
+way. For more on bootstrapping compilers, especially in verified contexts,
+see~\cite{Konat_2016,Myreen_2021}. Other unverified components include the
+preprocessor, assembler, and linker; the translation-validation approach helps
+to restore confidence in those steps~\cite[Section~5]{Kastner-LBSSF-2017}.
+Relatedly, cross-language linking has proven a challenge for verification
+efforts (see~\cite[Section~4]{Kastner-LBSSF-2017} and~\cite{Wang_2014}).
+
+\paragraph{Jitterbug.} Jitterbug~\cite{258848} was inspired by previous works
+(Serval~\cite{Nelson_2019}, Jitk~\cite{186144}, and CompCert's
+traces~\cite{Kastner-LBSSF-2017}) to create a tool for building and verifying
+single-pass JITs. They were specifically interested in the \gls{bpf} JIT in the
+Linux kernel. Jitterbug discharges most proofs via Rosette, and formalizes the
+meta-theoretic properties in Lean. Rosette enabled the develoment of a C-like
+DSL for building JITs with low-verification overhead. Rosette further allowed
+the team to implement synthesized optimizations. There are a number of
+unverified components in the implementation, but the development helped find and
+fix bugs in the Linux kernel, which is a serious security concern. The proof
+also exposed common proof challenges, such as
+\begin{itemize}
+    \item finding the right inductive invariant,
+    \item scaling the proof with existential quantifiers, explosion of symbolic
+        execution, and slow arithmetic operations,
+    \item cooperation between formally verified components and automatically
+        verified components,
+    \item not taking a clean-slate approach to have real-world impact, and
+    \item deciding what not to verify, which is often as important as deciding
+        what to verify.
+\end{itemize}
+
+\paragraph{Serval.} I briefly mentioned Serval above; Serval is a framework for
+developing automatic verifiers for systems software~\cite{Nelson_2019}. In the
+case-study, the authors retrofit CertikOS~\cite{199344} and
+Komodo~\cite{Ferraiuolo_2017} and examined \gls{bpf} compilers in the Linux
+kernel. Serval takes advantage of the state-machine refinement technique we saw
+in the hash table example. Serval notably separates the implementation language
+(\eg, C with \texttt{GCC}) from the proof language (a Rosette-built
+specification). This naturally begs the question of guaranteeing that the
+implementation actually corresponds to the proof; in the case of Serval, the
+input for verification is the assembly produced from the implementation. Serval
+also exposes challenges related to systems verification, such as memory models,
+as well as challenges of scale related to symbolic execution.
+
+\paragraph{Bedrock.} Bedrock is a possibly now-defunct\footnote{The software
+appears undeveloped since 2014, though it may just be that the development is
+stable.} but still interesting Coq development for low-level verification. The
+system enables reasoning about memory management and showcases a method similar
+to proof by reflection of verifying programs by comparison with
+functional\footnote{In the paradigm sense, rather than in the sense of
+``working.''} reference implementations. Bedrock was one of the first systems to
+enable reasoning about code pointers as data~\cite{Chlipala_2011} and
+cross-language verification~\cite{Wang_2014}. It also provides a case-study in
+modular verification via networking and web applications~\cite{Chlipala_2015}.
+The development of Coq tactics permits automation even in an interactive
+theorem-prover. Bedrock relies on separation logic like we saw in
+Section~\ref{S:t_logic}.
+
+\paragraph{Ynot.} Similarly, Ynot\footnote{which appears to have stalled since
+2010 or 2011} developed a higher order, dependently typed, monadic approach to
+verifying effectful programs with IO~\cite{Nanevski08ynot:reasoning}. Ynot
+is also a Coq development that encodes Hoare logic in its effect type, on
+which separation logic is built.
 
 \subsection{Further reading}\label{S:ex_reading}
