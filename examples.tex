@@ -927,3 +927,43 @@ is also a Coq development that encodes Hoare logic in its effect type, on
 which separation logic is built.
 
 \subsection{Further reading}\label{S:ex_reading}
+
+In this section I offer a number of related projects and research for the
+interested. The seL4 project has developed a verified
+microkernel~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Klein_AKMHF_18}.
+VeriSafeKV verified a key-value store based on the \(B^\epsilon\)-tree developed
+by~\cite{188458}, using techniques gleaned from distributed-systems
+verification~\cite{258969}. I've already mentioned IronClad and IronFleet for
+end-to-end full-stack
+verification~\cite{hawblitzel2014ironclad,hawblitzel2015ironfleet}. The Alive
+project brought verification to high-performance computing and floating-point
+computation by verifying peephole
+optimizations~\cite{Lopes_2018,Menendez_2016,Lopes_2015}. RedLeaf builds on
+SMACK, Boogie, and the Z3 \gls{smt} solver to build a safe and Hoare-logic
+verified OS kernel~\cite{Narayanan_2019,Narayan_2020}. Perennial brought Iris to
+a subset of Go to enable reasoning about crash-safe system~\cite{Chajed_2019}.
+AtomFS developed the first formally verified fine-grained concurrent file system
+and presents a concurrent relational logic with helpers for reasoning about such
+systems~\cite{Zou_2019}. Vigor aids the development of network functions with a
+push-button, minimal-experience approach, putting verification in reach for more
+people and projects~\cite{Zaostrovnykh_2019}. Hyperkernel brought push-button
+verification to a Unix-like kernel~\cite{Nelson_2017}. Komodo illustrates a
+verified alternative to Intel's SGX for user-mode enclaves and isolated
+execution~\cite{Ferraiuolo_2017}. Pantry extended recent work in proof-based
+verifiable computations to handle state, such as computations that interact with
+RAM or disks, like MapReduce jobs~\cite{Braun_2013}. Spice extended this result
+to formally verified state machines~\cite{222621}. The Ghosts of Departed Proofs
+paper introduces proof-carrying code as an API-design technique for
+Haskell~\cite{Noonan_2018}. DFSCQ improves on the
+Yggdrasil~\cite{Sigurbjarnarson_2016} and FSCQ~\cite{Chen_2015} file-system
+performance without sacrificing formal verification of crash-safety and
+sophisticated optimizations~\cite{Chen_2017}. SibylFS provides a model of
+file-systems that can be used to validate models and test file-systems of
+various stripes~\cite{Ridge_2015}. CSPEC is a framework for verifying concurrent
+software using mover types to re-order commutative operations~\cite{222565}.
+CertiKOS is yet another example of a verified concurrent OS
+kernel~\cite{199344}. For more on translation validation, I
+recommend~\cite{Pnueli_1998}, which describes techniques employed in
+translation-validation for optimizing compilers~\cite{Necula_2000} and a
+verified OS kernel~\cite{Sewell_2013}. The \gls{vst} provides verifiable C, a
+program logic for the C language~\cite{VST,Appel_2011}.
