@@ -32,7 +32,7 @@ claims about the termination of a particular program~\cite{Cook_2011}, perhaps
 intimidated by \citeauthor{Turing_1937}'s Halting Problem arguments; yet, proofs
 of termination, correctness, non-interference, and more are increasingly
 necessary and useful to reason about programs. For example, such proofs are now
-used to reason about OS
+used to reason about \gls{os}
 kernels~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Sewell_KH_16,Narayanan_2019,Narayan_2020,Nelson_2017},
 safety-critical systems such as avionics~\cite[\S 1]{Leroy-Compcert-CACM},
 in-kernel compilers~\cite{186144,258848}, file-systems~\cite{Zou_2019}, and
@@ -91,14 +91,14 @@ components, especially the top layers.
             \nodepart{one}Program source
             \nodepart{two}Compiler or Interpreter
             \nodepart{three}Executable Machine Code
-            \nodepart{four}OS and Kernel
+            \nodepart{four}\gls{os} and Kernel
             \nodepart{five}Hardware
         };
         \node[stack,right=of prog](verification){%
             \nodepart{one}Program verification
             \nodepart{two}Verified compilers or interpreters
             \nodepart{three}Translation Validation
-            \nodepart{four}Verified OS and Kernel
+            \nodepart{four}Verified \gls{os} and Kernel
             \nodepart{five}Verified Hardware
         };
         \draw[<->] (prog.one east) -- (verification.one west);
@@ -131,14 +131,14 @@ In order to execute the program, we have the remaining layers. In order:
         contend with.}
     \item\label{i:stack_asm} The produced executable machine code (\eg, ELF
         binaries)
-    \item\label{i:stack_OS} The OS and kernel responsible for managing execution
+    \item\label{i:stack_OS} The \gls{os} and kernel responsible for managing execution
         of the machine code
     \item\label{i:stack_hardware} The underlying hardware that carries out the
         instructions
 \end{enumerate}
 
 Items~\ref{i:stack_OS} and~\ref{i:stack_hardware} are out of scope for this
-paper. I refer the interested reader to research on verified OS and
+paper. I refer the interested reader to research on verified \gls{os} and
 kernels~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Sewell_KH_16,Narayanan_2019,Narayan_2020,Nelson_2017}
 and on verifying
 processors~\cite{sturton-memocode13,Sturton_2013,Bradfield_2016,zhang2017identifying,zhang2018recursive,zhang2018end}.
