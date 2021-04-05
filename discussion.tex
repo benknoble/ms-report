@@ -111,17 +111,17 @@ assembly-language semantics and related verification. Their DSL development
 takes promising steps towards improving the state of assembly verification. It
 also exposed questions of scale, portability, and testing (see
 Section~\ref{S:ex_notable}). Rosette identified challenges related to symbolic
-path explosion~\cite{Bornholt_2018,Porncharoenwase_2020}. CompCert examined the
+path explosion~\cite{Bornholt_2018,Porncharoenwase_2020}. CompCert exposes the
 problems of verifying linkers and assemblers in addition to questioning the
 extraction mechanism. Bootstrapping verified compilers is a studied but
 non-trivial technique~\cite{Konat_2016,Myreen_2021}, and the goal for CompCert
-would to extract to verifiable C. Jitterbug~\cite{258848} raises questions about
-integrating proof-developments into live software like the Linux kernel, where a
-clean-slate approach is impossible. They also reinforce the challenge of
-symbolic execution. One facet of the Jitterbug development involved reasoning
-across different verifiers (in particular, interactive and automatic), an area
-which has seen little research to my knowledge. Serval examined the challenge of
-separating implementation and verification while maintaining the necessary
-connections~\cite{Nelson_2019}. Bedrock, in a vein similar to Serval and
-CompCert, took one of the first looks at cross-language
-verification~\cite{Wang_2014}.
+is to extract verifiable C from the Coq development. Jitterbug~\cite{258848}
+raises questions about integrating proof-developments into live software like
+the Linux kernel, where a clean-slate approach is impossible. They also
+reinforce the challenge of symbolic execution. One facet of the Jitterbug
+development involved reasoning across different verifiers (in particular,
+interactive and automatic), an area which has seen little research to my
+knowledge. Serval examined the challenge of separating implementation and
+verification while maintaining the necessary connections~\cite{Nelson_2019}.
+Bedrock, in a vein similar to Serval and CompCert, took one of the first looks
+at cross-language verification~\cite{Wang_2014}.
