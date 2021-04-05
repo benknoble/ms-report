@@ -1,1 +1,127 @@
 \section{Discussion}\label{S:discussion}
+
+Having given an overview on verified programming and the tools used to build
+verified programming languages, I turn now to the frontier of the science: what
+challenges lie ahead? What open problems need answers?
+
+We saw in Section~\ref{S:stack} that today's programming environment is more
+expansive than a single program on a single machine.
+IronClad~\cite{hawblitzel2014ironclad} and
+IronFleet~\cite{hawblitzel2015ironfleet} address full-stack distributed
+verification, but I have not found any research on build-pipeline or deployment
+verification, nor on containerization, orchestration, and the like. On the one
+hand, we might hope that deployment steps are simple enough that the
+cost-benefit ratio of formal verification indicates the effort is not worth the
+confidence. Yet the mishaps that occur on mis-deployment might indicate
+otherwise, and the complexity of rollouts for some teams indicate a need for
+increased confidence. With respect to a build-pipeline, verified compilers like
+CompCert~\cite{Kastner-LBSSF-2017} yield verified compilation stages, but there
+are often other steps before and after compilation that are left unverified
+(they may, of course, be tested). There may be room to grow in this direction as
+well. Lastly, verified containerization technology would improve on today's
+state of systems based on Docker~\cite{merkel2014docker} and
+Kubernetes~\cite{k8s} by being able to guarantee the security and isolation
+promises of containerization, just like RustBelt~\cite{Jung_2018a} is now able
+to guarantee the safety promises of Rust.
+
+In the same section, we peeked into the deeper layers, like the executable
+machine code, the \gls{os}, and the hardware. Translation
+validation~\cite{Pnueli_1998} and verified compilers give confidence in the
+machine code, but CompCert still lacks a fully verified assembler and linker. A
+number of projects are researching verified \gls{os} and kernels (see
+Section~\ref{S:background} for a list) and discovering their own unique
+challenges in design and proof-management~\cite{Klein_AEMSKH_14}. Hardware
+presents verification challenges different from those of software; some current
+research is examining security properties and symbolic execution \`{a} la
+Rosette for hardware~\cite{zhang2018end}.
+
+In Section~\ref{S:t_interaction} we saw 3 types of verification tools
+(interactive, auto-active, and automatic). In our examples from
+Section~\ref{S:ex_ext}, we saw a comparison between one interactive proof and
+one auto-active proof, where both had benefits. Tools like Rosette and other
+push-button approaches bring yet more automation, at certain costs (\eg,
+finitization). Developing better automation tools for the interactive provers
+(\eg, Mtac~\cite{Kaiser_2018}, Iris proof mode~\cite{Krebbers_2017b}) will bring
+them closer to push-button tools, making them more accessible to an average
+developer. On the other hand, developing tools that provide more robust insights
+to the automatic provers (\eg,
+profiling~\cite{Bornholt_2018,Porncharoenwase_2020}) can help the programmer
+solve automation-related problems, especially exponential path explosion, scale,
+and timeout-demons. In a related vein, we saw the use of \texttt{\{:opaque\}} to
+combat automation issues related to quantifiers, and we also saw that Coq
+struggles to rewrite under the existential quantifier, demonstrating needs for
+improvements on these facets of the system.
+
+Iris and Section~\ref{S:t_logic} demonstrated that proof logics (\eg, extensions
+to Hoare-logic) are still under active development: while systems often need to
+build their own proof logics, checking that they are sound is a difficult
+process. Further, explaining and using them requires deep background. What new
+proof logics will we need to keep up with the state of programming technology?
+Iris was developed in part specifically for Rust; it also managed to position
+itself as a foundation for several older, more complex proof logics. As our
+language technology evolves, we will need increasingly sophisticated logics
+while we also hope to keep them accessible to the programmer writing proofs.
+Another possible direction here is to enable more rapid proof development:
+when developing a language model for a proof, like Rust, the programmer has to
+tie the syntax, semantics, and proof logic together. Facilitating these steps
+would help automate early development and allow the programmer to focus
+more on the proofs of interest. It would also enable a tighter feedback loop
+between model changes and proof updates.
+
+Section~\ref{S:t_pl} mentions several programming languages or paradigms along
+with their accompanying verification tools. Bringing verification to more
+languages and more languages to verification will remain an open problem for as
+long as we continue to develop new programming languages. One technique for
+doing verifying new languages is to lift a non-verified language into an
+already-verified language~\cite{leino2008specification}. A particular challenge
+when modelling new languages is to verify that the model is accurate to the
+language specification and implementation; CompCert provides a reference
+interpreter~\cite{Kastner-LBSSF-2017} for that purpose, though doing so is
+challenging~\cite[Chs. \emph{Simple Imperative Programs}, \emph{An Evaluation
+Function for Imp}]{Pierce:SF1}. In a similar vein, verifying compilation or
+interpretation for more languages would bring increased confidence to systems
+using those languages. While avionics is one example of safety-critical
+applications that relies on formal techniques, applications like financial
+software may not use them to their full extent, in part due to a lack of
+appropriate technology.
+
+When we looked at the extended examples in Section~\ref{S:ex_ext}, we saw early
+on that some programs and proofs produce executable programs, while others are
+only models that cannot actually be run. Proof by refinement can later tie an
+executable to the model, but refinement is often a meta-technique: there is no
+built-in support for the technique, so the programmer must build out both the
+technique and the argument that it is applicable. Similarly, the inductive
+state-machine model is better supported by some languages (\eg, Coq's inductive
+types) than others (\eg, Dafny's relation predicates, which are not tied
+together by any meaning other than what the programmer ascribes), which also
+impacts the statement of the specification. We also saw that graph and
+bit-vector proofs are unwieldy in some languages~\cite{Morrisett_2012}.
+
+We do see in the extended examples one use of parametric or abstract modules;
+Iris takes a similar approach, allowing the programmer to instantiate the module
+with specifics of the problem. The concept comes from ML's module system;
+specifically, it is analogous to functors in ML and OCaml, which are
+module-level functions from modules to modules. Developing further abstraction
+mechanisms might prove fruitful for some of the problems of proof development
+and automation.
+
+Other research demonstrated open problems in various related fields. For
+example, RockSalt~\cite{Morrisett_2012} shows a lack of strong tooling for
+assembly-language semantics and related verification. Their DSL development
+takes promising steps towards improving the state of assembly verification. It
+also exposed questions of scale, portability, and testing (see
+Section~\ref{S:ex_notable}). Rosette identified challenges related to symbolic
+path explosion~\cite{Bornholt_2018,Porncharoenwase_2020}. CompCert examined the
+problems of verifying linkers and assemblers in addition to questioning the
+extraction mechanism. Bootstrapping verified compilers is a studied but
+non-trivial technique~\cite{Konat_2016,Myreen_2021}, and the goal for CompCert
+would to extract to verifiable C. Jitterbug~\cite{258848} raises questions about
+integrating proof-developments into live software like the Linux kernel, where a
+clean-slate approach is impossible. They also reinforce the challenge of
+symbolic execution. One facet of the Jitterbug development involved reasoning
+across different verifiers (in particular, interactive and automatic), an area
+which has seen little research to my knowledge. Serval examined the challenge of
+separating implementation and verification while maintaining the necessary
+connections~\cite{Nelson_2019}. Bedrock, in a vein similar to Serval and
+CompCert, took one of the first looks at cross-language
+verification~\cite{Wang_2014}.
