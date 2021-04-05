@@ -921,12 +921,6 @@ The development of Coq tactics permits automation even in an interactive
 theorem-prover. Bedrock relies on separation logic like we saw in
 Section~\ref{S:t_logic}.
 
-\paragraph{Ynot.} Similarly, Ynot\footnote{which appears to have stalled since
-2010 or 2011} developed a higher order, dependently typed, monadic approach to
-verifying effectful programs with IO~\cite{Nanevski08ynot:reasoning}. Ynot
-is also a Coq development that encodes Hoare logic in its effect type, on
-which separation logic is built.
-
 \subsection{Further reading}\label{S:ex_reading}
 
 In this section I offer a number of related projects and research for the
@@ -968,4 +962,8 @@ kernel~\cite{199344}. For more on translation validation, I
 recommend~\cite{Pnueli_1998}, which describes techniques employed in
 translation-validation for optimizing compilers~\cite{Necula_2000} and a
 verified \gls{os} kernel~\cite{Sewell_2013}. The \gls{vst} provides verifiable
-C, a program logic for the C language~\cite{VST,Appel_2011}.
+C, a program logic for the C language~\cite{VST,Appel_2011}. Ynot\footnote{which
+appears to have stalled since 2010 or 2011} developed a higher order,
+dependently typed, monadic approach to verifying effectful programs with
+IO~\cite{Nanevski08ynot:reasoning}. Ynot is also a Coq development that encodes
+Hoare logic in its effect type, on top of which separation logic is built.
