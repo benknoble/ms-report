@@ -219,7 +219,7 @@ The key take-away is that this model of the program follows a suitably similar
 inductive state-machine relation as that of the original hash table. The key
 differences are network and distributed system abstractions and their
 incorporation into the host state-machine. The use of abstract models makes the
-model more re-usable and enables layering---proofs about low=level systems can be
+model more re-usable and enables layering---proofs about low-level systems can be
 nicely composed with proofs about the high-level via refinement, which I will
 discuss in Section~\ref{S:ex_spec}. We say that the distributed hash table
 model \emph{refines} the distributed system model.
@@ -241,8 +241,8 @@ regular expression's derivative with respect to the characters in the string;
 only if the final expression matches the empty string is the result considered a
 match. More details on the algorithm and definitions are
 in~\cite{Might_Yacc,Might_desugar,Might_deriv}. To formalize these definitions
-in Coq, I write three recursive functions (``Fix point''s in Cog's lingo). The
-first tests whether or not a regular-expression matches the empty string in the
+in Coq, I write three recursive functions that compute a fix-point. The first
+tests whether or not a regular-expression matches the empty string in the
 obvious way:
 
 \begin{align*}
@@ -371,7 +371,8 @@ table.
 
 Notice that we still need a meta-theoretic proof that for all propositions \(P\)
 about the distributed system state, Theorems~\ref{Th:h_init} and~\ref{Th:h_ind}
-imply that \(P\) holds for all state.
+imply that \(P\) holds for all state. That is, we haven't formalized the
+induction principle at play here.
 
 \begin{rem}
     Hiding behind the \(D\) subscript is the network: the collection of tables
@@ -886,7 +887,7 @@ also exposed common proof challenges, such as
     \item finding the right inductive invariant,
     \item scaling the proof with existential quantifiers, explosion of symbolic
         execution, and slow arithmetic operations,
-    \item cooperation between formally verified components and automatically
+    \item cooperation between interactively verified components and automatically
         verified components,
     \item not taking a clean-slate approach to have real-world impact, and
     \item deciding what not to verify, which is often as important as deciding
