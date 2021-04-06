@@ -104,7 +104,7 @@ examples include the Yggdrasil file-system~\cite{Sigurbjarnarson_2016} and the
 Hyperkernel \gls{os}~\cite{Nelson_2017}.
 
 A related challenge is exponential path explosion: symbolic evaluation may have
-to consider a rapidly-growing number of symbolic paths while generating
+to consider a rapidly growing number of symbolic paths while generating
 constraints. Rosette takes steps to solve this via aggressive partial
 evaluation~\cite{Torlak_2013,Torlak_2014}, lenient symbolic
 execution~\cite{Chang_2018}, and
@@ -286,10 +286,8 @@ need to make logical leaps to strengthen conditions as necessary, particularly
 where complex algebraic reasoning is required.
 
 Formally, \(P\) is a weakest pre-condition with respect to \(C\) and \(Q\) (\(P
-= \wpre{C,Q}\)) iff
-\begin{equation*}
-    \{P\} C \{Q\} \text{ and } \forall P', \{P'\} C \{Q\} \implies (P' \TO P).
-\end{equation*}
+= \wpre{C,Q}\)) iff \(\{P\} C \{Q\}\) and \(\forall P', \{P'\} C \{Q\} \implies
+(P' \TO P)\).
 
 The function \(\func{wp}\) is computable by structural induction on
 \(C\). Crucially, it is not a decidability function; it returns a proposition,
@@ -314,7 +312,8 @@ conjunction, the programmer gains the ability to reason about separate parts of
 the store or state.
 
 Other important rules in separation logics correspond to framing (as in
-``framing the world'', not ``stack frames'') and address and pointer manipulation.
+``framing the world'', not ``stack frames'') and address- and pointer-
+manipulation.
 
 \subsubsection{Concurrent Separation Logic}
 
