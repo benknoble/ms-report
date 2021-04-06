@@ -1,3 +1,51 @@
-\section{Conclusion}
+\section{Conclusion}\label{S:conclusion}
 
-\subsection{Further work}
+In this report, I have examined the state of research and development of
+formally verified programs and the technology behind them. I started with a
+historical background on formal methods before jumping to a modern context
+(Section~\ref{S:background}). I explored a fragment of today's programming
+environment with respect to formal verification, specifically, user programs and
+compilers (Section~\ref{S:stack}). I proposed three (3) axes along which to
+categorize verified programming tools:
+\begin{inlist}
+\item interactivity (Section~\ref{S:t_interaction}),
+\item proof logic (Section~\ref{S:t_logic}), and
+\item programming language (Section~\ref{S:t_pl}).
+\end{inlist}
+In particular, I examined the differences between interactive, auto-active, and
+automatic verifiers. I also discussed the prominent proof logic known as Hoare
+logic, along with a few variations like separation and concurrent separation
+logic. I then presented two (2) extended examples to demonstrate common proof
+architectures and challenges (Section~\ref{S:ex_ext}). I focused specifically on
+proofs by induction and reflection, on identifying the correct specification, on
+the contrasts between the proof environments, and on the challenges of
+automation. I then provided an overview of a large number of research projects,
+the problems they tackle, and the challenges they expose
+(Section~\ref{S:ex_notable}--\ref{S:ex_reading}). Lastly, I summarized the grand
+challenges of formal verification today: namely, challenges of automation,
+deployment, trusted software and hardware, program and proof logic, development
+ease and proof management, symbolic path explosion, and cross-language
+verification (Section~\ref{S:discussion}).
+
+I thus conclude the report on two notes: first, the last decade has seen an
+explosion of formal-verification research, leading to advanced development
+techniques and automation. We are growing closer to \citeauthor{EWD:EWD1036}'s
+dream of commonplace formal verification even as new waves of abstraction and
+generalization are invented. Second, formal verification is a growing body of
+science---and this means it has a growing body of open problems. The last decade
+has also seen an explosion of computing at scale, and one of the challenges of
+today's verification efforts will be to keep up, be it through novel automation
+and scaling techniques, more robust proof technology, or verified deployments.
+The same explosion has happened in the programming language world, so
+verification efforts will need to keep pace to bring verification to more
+languages and more languages to verification.
+
+The future of verification will also depend on good judgement: as~\cite{258848}
+reminds us, knowing what \emph{not} to verify is just as important as knowing
+what to verify. In some cases, informal arguments, unit testing, or other
+confidence-building disciplines are enough effort for value. In others, the
+benefits of formal verification outweigh the costs, either because the
+verification is automatic or because it is necessary. As formal verification
+becomes yet another tool in the programmer's toolbox~\cite{Brooks_1996}, the
+programmer will need to decide justly whether a problem needs the hammer of a
+proof or the light touch of another tool.
