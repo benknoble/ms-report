@@ -678,21 +678,9 @@ H : ([ ] =~ re1) /\ s =~ derive a re2
 (exists s0 s1 : list ascii, s = s0 ++ s1
                         /\ (s0 =~ derive a re1) /\ s1 =~ re2)
 \/ s =~ (if match_eps re1 then derive a re2 else EmptySet)
-
-========================= (3 / 4)
-
-([ ] =~ re1) /\ s =~ derive a re2
-\/ (exists s0 s1 : list ascii, s = s0 ++ s1
-                           /\ (a :: s0 =~ re1) /\ s1 =~ re2)
-
-========================= (4 / 4)
-
-([ ] =~ re1) /\ s =~ derive a re2
-\/ (exists s0 s1 : list ascii, s = s0 ++ s1
-                           /\ (a :: s0 =~ re1) /\ s1 =~ re2)
 \end{verbatim}
     \caption{Selected output from the interactive proof of
-    Lemma~\ref{Lem:r_derive}.}\label{F:r_derive}
+    Lemma~\ref{Lem:r_derive}. Subgoals 3 and 4 are elided.}\label{F:r_derive}
 \end{figure}
 
 In the first goal, for example, I can proceed on the cases of our
