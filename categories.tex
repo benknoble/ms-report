@@ -28,8 +28,6 @@ or the newer handbook~\cite{biere2009handbook}).
 
 \subsection{Type of Interaction}\label{S:t_interaction}
 
-\emph{TODO does \texttt{paragraph} or \texttt{subsubsection} work better?}
-
 By ``interaction'' I mean that between the programmer and the verifier: what is
 necessary to formulate proofs? Borrowing the terminology of~\cite[\S 2]{Nelson_2019},
 I dissect this axis into 3 major types of interaction:
@@ -42,36 +40,38 @@ I dissect this axis into 3 major types of interaction:
 For each type the referenced~\cite{Nelson_2019} provides a plethora of further
 examples.
 
-\paragraph{Interactive verification.} This is the model employed by interactive
-theorem-provers and proof-assistants such as Coq~\cite{Coq},
-Isabelle~\cite{Isabelle}, and HOL~\cite{HOL}. The programmer, having written
-programs and specifications, states theorems relating them (or lemmata,
-corollaries, \etc, as the case may be). In order to prove the statements, the
-programmer interacts directly with the system in a sort of call-and-response.
-The verifier presents a goal: prove this statement. The programmer can execute
-tactics to manipulate the goal, introduce quantified variables and hypothesis,
-and otherwise make progress towards the proof of the goal. The verifier
-represents the effect of these executions with another response, \eg, prove this
-statement in this context. The programmer continues this dialogue with the
-verifier, perhaps walking backwards and trying a different approach or walking
-forwards through the steps of the proof, until the verifier has been given a
-complete proof of all necessary goals.
+\subsubsection{Interactive verification}
+
+This is the model employed by interactive theorem-provers and proof-assistants
+such as Coq~\cite{Coq}, Isabelle~\cite{Isabelle}, and HOL~\cite{HOL}. The
+programmer, having written programs and specifications, states theorems relating
+them (or lemmata, corollaries, \etc, as the case may be). In order to prove the
+statements, the programmer interacts directly with the system in a sort of
+call-and-response. The verifier presents a goal: prove this statement. The
+programmer can execute tactics to manipulate the goal, introduce quantified
+variables and hypothesis, and otherwise make progress towards the proof of the
+goal. The verifier represents the effect of these executions with another
+response, \eg, prove this statement in this context. The programmer continues
+this dialogue with the verifier, perhaps walking backwards and trying a
+different approach or walking forwards through the steps of the proof, until the
+verifier has been given a complete proof of all necessary goals.
 
 Such systems may support automation in the sense of tactics that invoke other
 tactics based on the goal or context; these can range from proof searches to
 constraint solvers over linear integer arithmetic to manipulations necessary to
 hide details of the underlying logical system.
 
-\paragraph{Auto-active verification.} The approach taken by systems like
-Dafny~\cite{leino2010dafny}. The programmer annotates code both with
-specifications and proof hints, such as pre- or post- conditions or loop
-invariants. The verifier translates the source into a verification condition and
-uses a constraint solver to finish the verification. Some systems, such as
-Dafny, permit annotations that rise nearly to the level of proof texts like
-those of interactive verification, with composable theorems and lemmata in
-addition to functional specifications and standard annotations. While writing
-the proofs, though, the current state of the  goal and proof context are often
-hidden or implicit, since they are being translated for the constraint
+\subsubsection{Auto-active verification}
+
+The approach taken by systems like Dafny~\cite{leino2010dafny}. The programmer
+annotates code both with specifications and proof hints, such as pre- or post-
+conditions or loop invariants. The verifier translates the source into a
+verification condition and uses a constraint solver to finish the verification.
+Some systems, such as Dafny, permit annotations that rise nearly to the level of
+proof texts like those of interactive verification, with composable theorems and
+lemmata in addition to functional specifications and standard annotations. While
+writing the proofs, though, the current state of the  goal and proof context are
+often hidden or implicit, since they are being translated for the constraint
 solver\footnote{The original goal and context are of course visible in the
 original statement being proven.}. A call-and-response effort is possible in
 such systems to complete a proof, but a major challenge is to discover what the
@@ -80,26 +80,27 @@ to make progress. One power of this type of system is to free the programmer
 from all the details of the proof; the verifier often can handle simple
 statements on its own, while more complex statements can be proven with only a
 few well-directed hints. On the other hand, discovering which hints to use is
-like a game of ``20 Questions''\footnote{The programmer asks ``Would you be
-able to make progress on the proof if I could convince you of \(P\)?'' Based on
-the verifier's response, which is essentially ``yes'' or ``no'', a sub-proof of
+like a game of ``20 Questions''\footnote{The programmer asks ``Would you be able
+to make progress on the proof if I could convince you of \(P\)?'' Based on the
+verifier's response, which is essentially ``yes'' or ``no'', a sub-proof of
 \(P\) is given through hints or not, and the game continues. The summer course
 in~\cite{Kapritsos_2020} provides a detailed look at this style of proof in
 Dafny.}, and the resulting proofs can be difficult to read.
 
-\paragraph{Automatic verification.} The approach taken by
-Rosette~\cite{Torlak_2013}. An automatic verifier restricts the class of
-properties and programs that be verified in order to fully automate the process.
-The essential limit is finitization: finite specifications that can be
-implemented without unbounded loops allows symbolic evaluation or execution to
-generate constraints that can be handed off to a solver, much like in
-auto-active verification. The developer thus programs in such a restricted
-system and pushes the ``verify button'', invoking the symbolic evaluator and
-constraint solver. The limitations allow a greater degree of automation than in
-the previous cases, leading to the descriptor ``push-button verification''---no
-proof annotations are necessary. Such systems have been used to build
-surprisingly sophisticated programs given the finitization requirement; examples
-include the Yggdrasil file-system~\cite{Sigurbjarnarson_2016} and the
+\subsubsection{Automatic verification}
+
+The approach taken by Rosette~\cite{Torlak_2013}. An automatic verifier
+restricts the class of properties and programs that be verified in order to
+fully automate the process. The essential limit is finitization: finite
+specifications that can be implemented without unbounded loops allows symbolic
+evaluation or execution to generate constraints that can be handed off to a
+solver, much like in auto-active verification. The developer thus programs in
+such a restricted system and pushes the ``verify button'', invoking the symbolic
+evaluator and constraint solver. The limitations allow a greater degree of
+automation than in the previous cases, leading to the descriptor ``push-button
+verification''---no proof annotations are necessary. Such systems have been used
+to build surprisingly sophisticated programs given the finitization requirement;
+examples include the Yggdrasil file-system~\cite{Sigurbjarnarson_2016} and the
 Hyperkernel \gls{os}~\cite{Nelson_2017}.
 
 A related challenge is exponential path explosion: symbolic evaluation may have
