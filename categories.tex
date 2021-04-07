@@ -187,20 +187,21 @@ Hoare logic formalizes the notion of pre- and post-conditions with the
     \{P\} C \{Q\},
 \end{equation*}
 
-to indicate that command \(C\) has pre-condition \(P\) and post-condition
-\(Q\), both assertions (\eg, a claim about the current state). If \(P\) is
-established, executing \(C\) establishes \(Q\) (or \(C\) diverges). The
-programmer indicates that \(C\) diverges in a Hoare triple by choosing \(Q =
+to indicate that command \(C\) has pre-condition \(P\) and post-condition \(Q\),
+both assertions (\eg, a claim about the current state). The triple states that,
+if \(P\) is established, executing \(C\) establishes \(Q\) (or \(C\) diverges).
+The programmer indicates that \(C\) diverges in a Hoare triple by choosing \(Q =
 \bot\). Hoare logic permits reasoning about partial correctness; termination
 must be proven separately\footnote{Various sources claim it is possible to give
-rules for total correctness.}. The statement of the triple can thus be written
-using notation from \figurename~\ref{F:Imp_ex}, and assuming \(P\) and \(Q\) are
-functions from states to propositions
+rules for total correctness; the most complete rule I have seen involves
+bounding loops with a well-founded order.}. The statement of the triple can thus
+be written using notation from \figurename~\ref{F:Imp_ex}, and assuming \(P\)
+and \(Q\) are functions from states to propositions
 
 \begin{align*}
-    \{P\} C \{Q\} \definedas \forall s, s' : &(C, s) \To s' &\text{if \(C\) terminates} \\
-    &\implies P s &\text{and if \(P s\) holds} \\
-    &\implies Q s' &\text{then we can establish \(Q s'\) holds.}
+    \{P\} C \{Q\} \definedas \forall \sigma_1, \sigma_2 &: \comp{c}\sigma_1 \DownTo \sigma_2 &\text{if \(\mathtt{c}\) terminates} \\
+    &\implies P \sigma_1 &\text{and if \(P \sigma_1\) holds} \\
+    &\implies Q \sigma_2 &\text{then we can establish \(Q \sigma_2\) holds.}
 \end{align*}
 
 This is a model-theoretic Hoare logic: the proof-rules are stated in the terms
