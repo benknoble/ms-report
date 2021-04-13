@@ -19,9 +19,11 @@ preview:
 
 clean:
 	latexmk -c
+	-$(RM) *.v_tex
 
 distclean:
 	latexmk -C
+	-$(RM) *.v_tex
 
 maintainer-clean: distclean
 	git clean -fdx -e '*.sw*' -e '*.vim'

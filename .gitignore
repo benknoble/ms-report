@@ -16,3 +16,4 @@
 *.ist
 *.fls
 *.fdb_latexmk
+*.v_tex
