@@ -117,25 +117,58 @@ The approach taken by verifiers like Dafny~\cite{leino2010dafny}. The programmer
 annotates code both with specifications and proof hints, such as pre- or post-
 conditions or loop invariants. The verifier translates the source into a
 verification condition and uses a constraint solver to finish the verification.
-Some verifiers, such as Dafny, permit annotations that rise nearly to the level of
-proof texts like those of interactive verification, with composable theorems and
-lemmata in addition to functional specifications and standard annotations. While
-writing the proofs, though, the current state of the  goal and proof context are
-often hidden or implicit, since they are being translated for the constraint
-solver\footnote{The original goal and context are of course visible in the
-original statement being proven.}. A call-and-response effort is possible in
-such verifiers to complete a proof, but a major challenge is to discover what the
-automatic part of the verifier cannot prove and actively provide effective hints
-to make progress. One power of this type of verifier is to free the programmer
-from all the details of the proof; the verifier often can handle simple
-statements on its own, while more complex statements can be proven with only a
-few well-directed hints. On the other hand, discovering which hints to use is
-like a game of ``20 Questions''\footnote{The programmer asks ``Would you be able
-to make progress on the proof if I could convince you of \(P\)?'' Based on the
-verifier's response, which is essentially ``yes'' or ``no'', a sub-proof of
-\(P\) is given through hints or not, and the game continues. The summer course
-in~\cite{Kapritsos_2020} provides a detailed look at this style of proof in
-Dafny.}, and the resulting proofs can be difficult to read.
+Some verifiers, such as Dafny, permit annotations that nearly rise to the level
+of proof texts like those of interactive verification, with composable theorems
+and lemmata in addition to functional specifications and standard annotations.
+While writing the proofs, though, the current state of the  goal and proof
+context are often hidden or implicit, since the verifier translates the goal and
+context for the constraint solver\footnote{The original goal and context are of
+course visible in the original statement being proven.}. A call-and-response
+effort is possible in such verifiers to complete a proof, but a major challenge
+is to discover what the automatic part of the verifier cannot prove and actively
+provide effective hints to make progress. One power of this type of verifier is
+to free the programmer from all the details of the proof; the verifier often can
+handle simple statements on its own, while more complex statements can be proven
+with only a few well-directed hints. On the other hand, discovering which hints
+to use is like a game of ``20 Questions''\footnote{The programmer asks ``Would
+you be able to make progress on the proof if I could convince you of \(P\)?''
+Based on the verifier's response, which is essentially ``yes'' or ``no'', a
+sub-proof of \(P\) is given through hints or not, and the game continues. The
+summer course in~\cite{Kapritsos_2020} provides a detailed look at this style of
+proof in Dafny.}, and the resulting proofs can be difficult to read.
+
+\begin{figure}[ht]
+\begin{verbatim}
+predicate IsPrime(i:nat)
+{
+  i > 1 && (forall j | 1 < j < i :: i % j != 0)
+}
+
+method Main() {
+  assert forall P :: P ==> P;
+  assert 5 in [1,2,3,4,5];
+  assert !IsPrime(0);
+  assert !IsPrime(1);
+  assert IsPrime(2);
+  assert IsPrime(3);
+  // counter example for the proof to work
+  assert 6 % 3 == 0;
+  assert !IsPrime(6);
+}
+\end{verbatim}
+    \caption{Example auto-active proofs in Dafny. Responses are provided upon
+    invoking the Dafny compiler.}\label{F:dafny_ex}
+\end{figure}
+
+The example proofs (\(\forall P, P \implies P\) and \(5\) is in a long list
+containing \(5\)) in Dafny are completely automatically checked by the Dafny
+compiler, as shown in \figurename~\ref{F:dafny_ex}. However, let's add the
+\(\func{IsPrime}\) predicate. Dafny can automatically find proofs for the
+primality of 0, 1, 2, and 3. At 6, however, Dafny doesn't know what to do, and
+the hint \(6 \mod 3 = 0\) is necessary to prove 6 is not prime. Removing the
+line causes a verification error; adding it gives Dafny enough to disprove the
+disjunct. Discovering that this is the missing information is rather like taking
+an educated guess.
 
 \subsubsection{Automatic verification}
 
