@@ -66,41 +66,50 @@ this dialogue with the verifier, perhaps walking backwards and trying a
 different approach or walking forwards through the steps of the proof, until the
 verifier has been given a complete proof of all necessary goals.
 
-The following example demonstrates one Coq proof of a simple tautology through
-tactics:
+\begin{figure}[ht]
 \begin{coq_example}
-    Goal forall P: Prop, P -> P.
-    (* introduce the hypothesis *) intros.
-    (* prove P by assumption, named H *) assumption.
-    Qed.
+Goal forall P: Prop, P -> P.
+intros.
+assumption.
+Qed.
 \end{coq_example}
+    \caption{Proving a simple tautology in Coq.}\label{F:coq1}
+\end{figure}
+
+The example in \figurename~\ref{F:coq1} demonstrates one Coq proof of a
+simple tautology through tactics. The \texttt{intros} tactic introduces
+quantified variables for manipulation; \texttt{assumption} looks for a
+hypothesis in the context that matches the goal.
 
 Such verifiers may support automation in the sense of tactics that invoke other
 tactics based on the goal or context; these can range from proof searches to
 constraint solvers over linear integer arithmetic to manipulations necessary to
 hide details of the underlying logical verifier.
 
-For example, the above prove is completely finished by tactics like
-\texttt{tauto} or \texttt{auto}. Advanced automation can be used to show \(10
-\in [1,2,3,4,5,6,7,8,9,10]\), where the \(\func{In}\) relation below is computed
+\begin{figure}[ht]
+\begin{coq_eval}
+Require Import List.
+Import ListNotations.
+\end{coq_eval}
+\begin{coq_example}
+Goal In 5 [1;2;3;4;5].
+simpl; right; right; right; right.
+(* too manual, try again *) Undo.
+repeat (try (left; reflexivity); right).
+Qed.
+\end{coq_example}
+    \caption{Proving a tedious proof with automation in Coq.}\label{F:coq2}
+\end{figure}
+
+For example, the prove in \figurename~\ref{F:coq1} is completely finished by
+tactics like \texttt{tauto} or \texttt{auto}. Advanced automation can be used to
+show \(5 \in [1,2,3,4,5]\), where the \(\func{In}\) relation below is computed
 as follows: \(\func{In}\) is false for any value and the empty list.
 \(\func{In}\) is true if either the value is the head of the list or it is in
 the tail of the list. Without automation, the proof consists of the
-\texttt{right} tactic eight times to get to the correct disjunct; only then can
-we finish by selecting the \texttt{left} case and proving it (trivially, \(10 =
-10\)).
-
-\begin{coq_eval}
-    Require Import List.
-    Import ListNotations.
-\end{coq_eval}
-\begin{coq_example}
-    Goal In 10 [1;2;3;4;5;6;7;8;9;10].
-    simpl; right; right.
-    (* too manual, try again *) Undo.
-    repeat (try (left; reflexivity); right).
-    Qed.
-\end{coq_example}
+\texttt{right} tactic four times to get to the correct disjunct; only then can
+we finish by selecting the \texttt{left} case and proving it (trivially, \(5 =
+5\)). This is explicated in \figurename~\ref{F:coq2}.
 
 \subsubsection{Auto-active verification}
 
