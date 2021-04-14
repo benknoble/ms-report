@@ -186,6 +186,50 @@ to build surprisingly sophisticated programs given the finitization requirement;
 examples include the Yggdrasil file-system~\cite{Sigurbjarnarson_2016} and the
 Hyperkernel \gls{os}~\cite{Nelson_2017}.
 
+\begin{figure}[ht]
+\begin{verbatim}
+#lang rosette
+
+;; Let x be any integer
+(define-symbolic x integer?)
+
+;; Let b be any bool
+(define-symbolic b boolean?)
+
+;; Verify that b => b for any boolean b
+(verify (assert (=> b b)))
+
+;; Verify that |x| >= 0 for any integer x
+(define (abs x)
+  (if (>= x 0)
+      x
+      (- x)))
+(verify (assert (>= (abs x) 0)))
+
+(verify (assert (member 5 '(1 2 3 4 5))))
+
+(define (prime? n)
+  (and (> n 1)
+       ;; forall 2 < i < n,
+       ;; (modulo n i) is not zero
+       (andmap (compose1 not zero? (curry modulo n))
+               (build-list (- n 2) (curry + 2)))))
+
+(verify (assert (not (prime? 0))))
+(verify (assert (not (prime? 1))))
+(verify (assert (prime? 2)))
+(verify (assert (not (prime? 6))))
+\end{verbatim}
+    \caption{Example automatic proofs in Rosette. Running the program with
+    Racket shows that the assertions are verified.}\label{F:rosette}
+\end{figure}
+
+\figurename~\ref{F:rosette} demonstrates the same proofs from before, and a
+proof that \(\forall x, \abs{x} \ge 0\), all of which are accomplished
+completely automatically by Rosette. In particular, the primality and membership
+proofs use Rosette's partial evaluation, so that the statements are effectively
+proving a constant truth value.
+
 A related challenge is exponential path explosion: symbolic evaluation may have
 to consider a rapidly growing number of symbolic paths while generating
 constraints. Rosette takes steps to solve this via aggressive partial
