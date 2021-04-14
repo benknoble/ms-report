@@ -5,7 +5,7 @@ These are
 \begin{enumerate}
     \item the type of interaction;
     \item the type of proof logic; and
-    \item the type of supported programming languages.
+    \item the type of programming languages.
 \end{enumerate}
 
 I examine each in turn in Sections~\ref{S:t_interaction},~\ref{S:t_logic},
@@ -22,7 +22,7 @@ Iris is built on Coq). The encapsulation provided by many verifiers obviates a
 need to consider their underlying logics. Except in the case of a leaky
 abstraction~\cite{Spolsky_2002}, wherein the underlying verifier's logic leaks
 out to the logic of the proof, the programmer tasked with writing the proof is
-concerned with the proof-logic and the proof to be written. The
+concerned with the proof logic and the proof to be written. The
 programmer interested in building a programming language for verified languages
 should certainly study verification logic, in addition to verification logics
 like \gls{smt} or \gls{coc} and the architectures of such verifiers (\eg, for
@@ -101,7 +101,7 @@ Qed.
     \caption{Proving a tedious proof with automation in Coq.}\label{F:coq2}
 \end{figure}
 
-For example, the prove in \figurename~\ref{F:coq1} is completely finished by
+For example, the proof in \figurename~\ref{F:coq1} is completely finished by
 tactics like \texttt{tauto} or \texttt{auto}. Advanced automation can be used to
 show \(5 \in [1,2,3,4,5]\), where the \(\func{In}\) relation below is computed
 as follows: \(\func{In}\) is false for any value and the empty list.
@@ -200,18 +200,13 @@ Hyperkernel \gls{os}~\cite{Nelson_2017}.
 (verify (assert (=> b b)))
 
 ;; Verify that |x| >= 0 for any integer x
-(define (abs x)
-  (if (>= x 0)
-      x
-      (- x)))
+(define (abs x) (if (>= x 0) x (- x)))
 (verify (assert (>= (abs x) 0)))
 
 (verify (assert (member 5 '(1 2 3 4 5))))
 
 (define (prime? n)
   (and (> n 1)
-       ;; forall 2 < i < n,
-       ;; (modulo n i) is not zero
        (andmap (compose1 not zero? (curry modulo n))
                (build-list (- n 2) (curry + 2)))))
 
@@ -241,14 +236,7 @@ developer the meaning of the results in the program domain.
 
 \subsection{Type of Proof Logic}\label{S:t_logic}
 
-A full account of proof-logics for programs would be a long paper in its own
-right and is out of scope for this report. Look no further than
-\figurename~\ref{F:iris_complex} to see how complicated the topology of (a
-subset of) proof-logics can be. Instead, I will mention a key proof-logic
-(namely, Hoare logic) and some of its extensions. For another mention of
-program- and proof- logics and their uses, see~\cite[\S 5]{Appel_2011}.
-
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{img/iris_2_0_concurrent_logics}
     \caption{A figure from a presentation on Iris~\cite{Jung_2016_slides}
@@ -258,23 +246,14 @@ program- and proof- logics and their uses, see~\cite[\S 5]{Appel_2011}.
     individual logics may be derived.}\label{F:iris_complex}
 \end{figure}
 
-All proof-logics for programs combine a set of logic-rules with the semantics of
-the program's language. In the simplest case, the programmer combines
-``regular'' logic (in the sense of \gls{coc} or ZFC) with the semantics to write
-proofs about program equivalences, termination, and transformations.
-\emph{Software Foundations} shows it's possible to prove interesting
-meta-theoretic\footnote{``meta'' because they are ``properties of the language
-as a whole, rather than of particular programs''~\cite{Pierce:SF2}. It is also
-possible to prove claims about specific programs this way, but, at least in some
-verifiers, this becomes unwieldy.} claims about a language using these techniques
-in their discussions about \emph{Simple Imperative Programs}~\cite{Pierce:SF1}
-and \emph{Program Equivalence}~\cite{Pierce:SF2} and provides an introduction to
-such proofs. Essentially, standard reasoning rules about logic formulae are
-combined with the inference rules that define the semantics. An example is
-provided in \figurename~\ref{F:Imp_ex}. I refer
-to~\cite{Winskel_1993,Harper_2016} for introductions to program semantics.
+A full account of proof logics for programs would be a long paper in its own
+right and is out of scope for this report. Look no further than
+\figurename~\ref{F:iris_complex} to see how complicated the topology of (a
+subset of) proof logics can be. Instead, I will mention a key proof logic
+(namely, Hoare logic) and some of its extensions. For another explanation of
+program and proof logics and their uses, see~\cite[\S 5]{Appel_2011}.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{mathpar}
 
@@ -292,62 +271,86 @@ to~\cite{Winskel_1993,Harper_2016} for introductions to program semantics.
 
     \end{mathpar}
     \caption{Sample inference rules for \texttt{Imp}, a simple imperative
-    language. \iname{E-APlus} shows how to add two arithmetic expressions, where
-    \(\eval{e}{\sigma} = x\) means ``evaluation of \(e\) under a state
-    \(\sigma\) produces \(x\).'' Similarly, \iname{E-Seq} shows how to sequence
-    two statements \(c_1, c_2\), where \(\comp{c}{\sigma} \DownTo \sigma'\)
-    means ``computing statement \(c\) in state \(\sigma\) produces the new state
-    \(\sigma'\).''}\label{F:Imp_ex}
+    language. \iname{E-APlus} shows how to add two arithmetic expressions.
+    Similarly, \iname{E-Seq} shows how to sequence two statements \(c_1,
+    c_2\).}\label{F:Imp_ex}
 \end{figure}
+
+All proof logics for programs combine a set of logic rules with the semantics of
+the program's language. In the simplest case, the programmer combines
+``regular'' logic (in the sense of \gls{coc} or ZFC) with the semantics to write
+proofs about program equivalences, termination, and transformations.
+\emph{Software Foundations} provides an introduction to proving interesting
+meta-theoretic\footnote{``meta'' because they are ``properties of the language
+as a whole, rather than of particular programs''~\cite{Pierce:SF2}. It is also
+possible to prove claims about specific programs this way, but, at least in some
+verifiers, this becomes unwieldy.} claims about a language using these
+techniques in Chapters \emph{Simple Imperative Programs}~\cite{Pierce:SF1} and
+\emph{Program Equivalence}~\cite{Pierce:SF2}. Essentially, standard reasoning
+rules about logic formulae are combined with the inference rules that define the
+semantics. An example is provided in \figurename~\ref{F:Imp_ex}. We use the
+following notation:
+
+\begin{itemize}
+    \item \(\eval{e}{\sigma} = x\) means ``evaluation of \(e\) under a state
+        \(\sigma\) produces \(x\)'', and
+
+    \item \(\comp{c}{\sigma} \DownTo \sigma'\) means ``computing statement \(c\)
+        in state \(\sigma\) produces the new state \(\sigma'\).''
+\end{itemize}
+
+We refer the reader to~\cite{Winskel_1993,Harper_2016} for introductions to
+program semantics.
 
 \subsubsection{Hoare Logic}
 
 When turning to program verification\footnote{Recall \citeauthor{EWD:EWD1036}'s
 act of proving a program implements its specification.}, \emph{Software
 Foundations} introduces Hoare logic. Hoare logic, with its many variations, is
-the predominant proof-logic for program verification. Originating in
-\citeyear{Hoare_1969} with \citeauthor{Hoare_1969}'s paper~\cite{Hoare_1969},
-Hoare logic formalizes the notion of pre- and post-conditions with the
-\emph{Hoare triple}, written
+the predominant proof logic for program verification. Originating in
+\citeyear{Hoare_1969}~\cite{Hoare_1969}, Hoare logic formalizes the notion of
+pre- and post-conditions with the \emph{Hoare triple}, written
 
 \begin{equation*}
     \{P\} C \{Q\},
 \end{equation*}
 
 to indicate that command \(C\) has pre-condition \(P\) and post-condition \(Q\),
-both assertions (\eg, a claim about the current state). The triple states that,
-if \(P\) is established, executing \(C\) establishes \(Q\) (or \(C\) diverges).
-The programmer indicates that \(C\) diverges in a Hoare triple by choosing \(Q =
-\bot\). Hoare logic permits reasoning about partial correctness; termination
-must be proven separately\footnote{Various sources claim it is possible to give
-rules for total correctness; the most complete rule I have seen involves
-bounding loops with a well-founded order.}. The statement of the triple can thus
-be written using notation from \figurename~\ref{F:Imp_ex}, and assuming \(P\)
-and \(Q\) are functions from states to propositions
+both assertions. As an example, consider
+the pre-condition \(X = 1\) and the command \(X \gets X + 1\) with the obvious
+semantics. It is easy to prove the post-condition \(X = 2\). We call such
+conditions \emph{assertions}---they map a state \(\sigma\) to a claim about the
+state, such as ``In state \(\sigma\), \(X\) is 1.''
+
+The triple states that, if \(P\) is established, executing \(C\) establishes
+\(Q\) (or \(C\) does not terminate). This statement can thus be written using
+notation from \figurename~\ref{F:Imp_ex}, with \(P\) and \(Q\) assertions about
+the state of the program,
 
 \begin{align*}
     \{P\} C \{Q\} \definedas \forall \sigma_1, \sigma_2 &: \comp{c}\sigma_1 \DownTo \sigma_2 &\text{if \(\mathtt{c}\) terminates} \\
-    &\implies P \sigma_1 &\text{and if \(P \sigma_1\) holds} \\
-    &\implies Q \sigma_2 &\text{then we can establish \(Q \sigma_2\) holds.}
+    &\implies P\, \sigma_1 &\text{and if \(P\, \sigma_1\) holds} \\
+    &\implies Q\, \sigma_2 &\text{then we can establish \(Q\, \sigma_2\) holds.}
 \end{align*}
 
-This is a model-theoretic Hoare logic: the proof-rules are stated in the terms
-of the model. Hoare logic can also be defined in proof-theory; this is arguably
-more common~\cite[Ch. \emph{Hoare Logic as a Logic}]{Pierce:SF2}. Such a
-statement avoids ascribing direct meaning to Hoare triples and instead gives
-syntactic derivation rules. These rules are the same judgements as in the
-model-theoretic definition, and the two are consistent with each other.
+The programmer indicates that \(C\) does not terminate, or that \(C\)
+\emph{diverges}, in a Hoare triple by choosing \(Q = \bot\). Since termination
+is a hypothesis in the Hoare triple, showing \(C\) does not terminate leads to a
+contradiction, from which we can derive \(\bot\). Hoare logic permits reasoning
+about partial correctness; termination must be proven
+separately\footnote{Various sources claim it is possible to give rules for total
+correctness; the most complete rule I have seen involves bounding loops with a
+well-founded order.}.
 
-Reasoning with Hoare logic mimics the structure of the program,
-as triples can be effectively combined to build up claims about the entire
-program. The rules for doing so resemble those of ``regular'' logic formulae
-above, with some connectives for strengthening pre-conditions or weakening
-post-conditions. Formalizations and uses of these rules often work backwards;
-the natural way to construct a Hoare logic proof is to start at the final
-post-condition and move backwards to the beginning. A selection of rules are
-presented in \figurename~\ref{F:Hoare_ex}.
+This is a model-theoretic Hoare logic: the proof rules are stated in terms of
+the model. Hoare logic can also be defined in proof theory; this is arguably
+more common~\cite[Ch.\ \emph{Hoare Logic as a Logic}]{Pierce:SF2}.
+Proof-theoretic Hoare logic avoids ascribing direct meaning to Hoare triples and
+instead gives syntactic derivation rules. The proof-theoretic derivation rules
+are the same judgements as in the model-theoretic definition, and the two are
+consistent with each other.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{mathpar}
 
@@ -364,15 +367,25 @@ presented in \figurename~\ref{F:Hoare_ex}.
     \end{mathpar}
     \caption{Two examples of the rules of Hoare logic.
     \iname{Hoare-Consequence-Pre} captures the notion that we can strengthen the
-    pre-condition from \(P'\) to \(P\) and still have a valid triple (\(\TO\) is
-    analogous to implication, with the definition \(\forall s: P s \implies P'
-    s\)). \iname{Hoare-Seq} provides an analogue to \iname{E-Seq} from
+    pre-condition from \(P'\) to \(P\) and still have a valid triple.
+    \iname{Hoare-Seq} provides an analogue to \iname{E-Seq} from
     \figurename~\ref{F:Imp_ex}. The programmer composes rules like these rather
     than invoking the definition of a Hoare triple whenever possible, using a
     higher level of abstraction.}\label{F:Hoare_ex}
 \end{figure}
 
-I should note that, while Hoare logics are mostly seen for imperative
+Reasoning with Hoare logic mimics the structure of the program, as triples can
+be effectively combined to build up claims about the entire program. The rules
+for doing so resemble those of ``regular'' logic formulae above, with theorems
+for strengthening pre-conditions or weakening post-conditions. Formalizations
+and uses of these rules often work backwards; the natural way to construct a
+Hoare logic proof is to start at the final post-condition and move backwards to
+the beginning. A selection of rules are presented in
+\figurename~\ref{F:Hoare_ex}. We introduce the notation \(P \TO P'\), which is
+analogous to implication: the definition is \(\forall \sigma: P\, \sigma
+\implies P'\, \sigma\).
+
+I should note that, although Hoare logics are mostly seen for imperative
 programming languages, they are also applicable to functional languages. For
 example, Iris~\cite[\S 5.1]{Krebbers_2017b} and the RustBelt project~\cite[\S
 3.2, esp. \figurename~3]{Jung_2018a} have demonstrated the applicability of a
@@ -382,12 +395,12 @@ languages.
 \subsubsection{Pre-, post-, and weakest conditions}
 
 The choice of pre- and post- conditions is up to the programmer, who wants to
-prove that the program implements a spec \(\var{Spec}\). A natural choice for
-the post-condition is some \(Q\) that implies \(\var{Spec}\). Similarly, a
-natural choice for the pre-condition is some \(P\), possibly corresponding to
-constraints on the program inputs, and that also allows the programmer to prove
-\(\{P\} C \{Q\}\). Then we can claim that if \(C\) terminates under
-pre-conditions \(P\) then \(P \implies C \models \var{Spec}\).
+prove that the program implements a specification \(\var{Spec}\). A natural
+choice for the post-condition is some \(Q\) that implies \(\var{Spec}\).
+Similarly, a natural choice for the pre-condition is some \(P\), possibly
+corresponding to constraints on the program inputs, and that also allows the
+programmer to prove \(\{P\} C \{Q\}\). Then we can claim that if \(C\)
+terminates under pre-conditions \(P\) then \(P \implies C \models \var{Spec}\).
 
 The programmer could also choose \(P = \bot\), in which case any post-condition
 at all is valid, including the \(Q\) that entails \(\var{Spec}\) from earlier
@@ -398,30 +411,40 @@ any behavior whatsoever is allowed!
 
 In a similar vein, we can always add extraneous information to the pre-condition
 which is not used; this does not necessarily invalidate our proof in the same
-way, but such information may not be needed.
+way, but such information may not be needed. It is convenient to avoid
+unnecessarily strengthening pre-conditions in the overall program statement, as
+they might unnecessarily restrict the proof's application to the program. An
+example will clarify: consider \(\{X = 1\}X \gets X + 1\{X > 0\}\) with \(X \in
+\Z\). Clearly, the precondition is sufficient to establish the post-condition,
+but proving this triple only establishes the program's correctness when \(X =
+1\). If we are interested in more than this narrow situation, we need a weaker
+pre-condition; otherwise, we are constrained to only trusting the program when
+\(X = 1\) holds. In this particular case, we only need to know that \(X + 1 >
+0\), \ie, \(X \ge 0\). Now our program is provably correct in many more cases.
 
 To prevent such absurd pre-conditions as \(\bot\) and to streamline their
 generation, many verifiers make use of ``weakest
 pre-conditions''~\cite{dijkstra1976discipline,Nelson_1989} (cited
 in~\cite{leino2008specification}). The intuitive idea is that for some statement
 \(C\) and some post-condition \(Q\) we denote by \(\wpre{C, Q}\) the ``minimal''
-information we need to correctly establish \(Q\), \ie, such that the triple
-\(\{\wpre{C,Q}\} C \{Q\}\) is provable. The programmer must still choose an
-appropriate \(Q\) to establish \(\var{Spec}\); the generation of the required
-pre-conditions can now be automated. Note that this does not mean the proof will
-be straightforward with \emph{only} these pre-conditions! The programmer may
-need to make logical leaps to strengthen conditions as necessary, particularly
-where complex algebraic reasoning is required.
-
-Formally, \(P\) is a weakest pre-condition with respect to \(C\) and \(Q\) (\(P
-= \wpre{C,Q}\)) iff \(\{P\} C \{Q\}\) and \(\forall P', \{P'\} C \{Q\} \implies
-(P' \TO P)\).
+non-\(\bot\) information we need to correctly establish \(Q\), \ie, such that
+the triple \(\{\wpre{C,Q}\} C \{Q\}\) is provable and the pre-condition is not
+\(\bot\). Formally, \(P\) is a weakest pre-condition with respect to \(C\) and
+\(Q\) (\(P = \wpre{C,Q}\)) iff \(\{P\} C \{Q\}\) and \(\forall P', \{P'\} C
+\{Q\} \implies (P' \TO P)\).
 
 The function \(\func{wp}\) is computable by structural induction on
 \(C\). Crucially, it is not a decidability function; it returns a proposition,
 not a proof. An extended example is found in~\cite[\S 3]{leino2008specification},
 where weakest pre-conditions provide the vehicle used to translate from
 Dafny~\cite{leino2010dafny} to Boogie~\cite{Barnett_2006,leino2008this}.
+
+The programmer must still choose an appropriate \(Q\) to establish
+\(\var{Spec}\); the generation of the required pre-conditions can be automated
+by use of \(\wpre{\cdot,Q}\). Note that this does not mean the proof will be
+straightforward with \emph{only} these pre-conditions. The programmer may need
+to make logical leaps to strengthen conditions as necessary, particularly where
+complex algebraic reasoning is required.
 
 \subsubsection{Separation Logic}
 
@@ -433,15 +456,34 @@ logic}~\cite{Reynolds}.
 The crucial extension is to differentiate between the assertion \(P \land Q\),
 which denotes that both conjuncts hold on the current state, and the assertion
 \(P * Q\), which denotes that each conjunct holds on a disjoint part of the
-current state. In other words, the state \(s\) can be split into \(s_1, s_2\)
-(often written \(s = s_1 \uplus s_2\)) such that \(P\) holds on \(s_1\) and
-\(Q\) holds on \(s_2\). Along with rules for manipulating this new separating
-conjunction, the programmer gains the ability to reason about separate parts of
-the store or state.
+current state. In other words, the state \(s\) can be split into \(\sigma_1,
+\sigma_2\) (often written \(\sigma = \sigma_1 \uplus \sigma_2\)) such that \(P\)
+holds on \(\sigma_1\) and \(Q\) holds on \(\sigma_2\). Along with rules for
+manipulating this new separating conjunction, the programmer gains the ability
+to reason about separate parts of the store or state. Other important rules in
+separation logics correspond to framing the state needed by execution of the
+program and address- and pointer- manipulation. Together, these rules facilitate
+reasoning about pointers and data-structures. The separation of state also
+facilitates local reasoning---the correctness of a part of the program is
+allowed to depend only on the part of the state it uses. Once that part of the
+program is proven correct, we can separately extend the used state with unused
+state via the frame rule. The extension does not affecting correctness and
+guarantees that the unused part of the extended state is not modified by the
+program. \figurename~\ref{F:frame} demonstrates the frame rule; notice the side
+condition that none of the variables modified by \(C\) are free in \(R\).
 
-Other important rules in separation logics correspond to framing (as in
-``framing the world'', not ``stack frames'') and address- and pointer-
-manipulation.
+\begin{figure}[ht]
+    \centering
+    \begin{mathpar}
+        \inference[\iname{Frame}]{%
+            \{P\} C \{Q\} & \func{mod}(C) \intersect \func{fv}(R) = \emptyset
+        }{\{P * R\} C \{Q * R\}}
+
+        \and
+    \end{mathpar}
+    \caption{The frame rule from separation logic which allows extension of the
+    proof with disjoint state.}\label{F:frame}
+\end{figure}
 
 \subsubsection{Concurrent Separation Logic}
 
@@ -449,22 +491,20 @@ For reasoning about concurrency, Hoare logic and separation logic remained
 inadequate; \citeauthor{O_Hearn_2007} proposed a \emph{concurrent separation
 logic} to solve the problem~\cite{O_Hearn_2007}. \citeauthor{Brookes_2007}
 provides a model in the companion paper~\cite{Brookes_2007}. Both papers discuss
-the difficulty of soundness in such a logic---that, and the plethora of
-subsequent separation and concurrent logics that have been developed
+the difficulty of ensuring that such a logic is \emph{sound}, \ie, that every
+provable formula in the logic is semantically valid. The soundness problem
+coupled with the plethora of available separation and concurrent logics
 (\figurename~\ref{F:iris_complex}), each with their own complex rules,
 demonstrate the difficulty both of developing and reasoning in a concurrent
 separation logic. Reasoning about parallel programs may bring inherent
 complexity to the problem. The various concurrent logics add rules required for
 their specific uses, \eg, partial ownership or permissions in the case
-of~\cite{Appel_2011}, which might require use of a separation algebra. Iris
-carries these constructions to their limits, developing a foundational
-separation algebra and parameterized logic that can be used to derive new
-logics~\cite{Jung_2018b}.
+of~\cite{Appel_2011}, which might require use of a \emph{separation
+algebra}~\cite{Jung_2016,Krebbers_2017a}. Iris carries these constructions to
+their limits, developing a foundational separation algebra and parameterized
+logic that can be used to derive new logics~\cite{Jung_2018b}.
 
-One of the original concurrent separation logic proof rules
-from~\cite{O_Hearn_2007} is presented in \figurename~\ref{F:CSL_ex}.
-
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{mathpar}
 
@@ -478,23 +518,27 @@ from~\cite{O_Hearn_2007} is presented in \figurename~\ref{F:CSL_ex}.
 
     \end{mathpar}
     \caption{A separation logic rule for reasoning about the concurrent
-    execution of \(C_1\) and \(C_2\), denoted by \(\cdot \parallel \cdot\)
-    from~\cite{O_Hearn_2007}.}\label{F:CSL_ex}
+    execution of \(C_1\) and \(C_2\).}\label{F:CSL_ex}
 \end{figure}
 
-\subsection{Type of Supported Programming Languages}\label{S:t_pl}
+One of the original concurrent separation logic proof rules
+from~\cite{O_Hearn_2007} is presented in \figurename~\ref{F:CSL_ex}. The
+notation \(\cdot \parallel \cdot\) from~\cite{O_Hearn_2007} denotes concurrent
+execution.
 
-The supported languages are as varied as the programming language options
-available to today's programmer, from MLs~\cite{Coq,Kumar_2014}, Lisps and
-Schemes~\cite{Torlak_2013} to object-oriented
-systems~\cite{leino2008specification,leino2010dafny} and bare-metal
-assembly~\cite{Chlipala_2011} on top of which further abstractions can be
-built~\cite{Chlipala_2015}. While this variety appears to present overwhelming
-choice to the programmer who wishes to verify a program, reality belies a
-simpler problem: some languages and design decisions are better suited to
-certain problem domains than others. Correspondingly, certain proof logics are
-better suited to certain domains, and one often finds pairings between language
-and logic for the task at hand.
+\subsection{Type of Programming Languages}\label{S:t_pl}
+
+The programming languages supported by verifiers are as varied as the
+programming language options available to today's programmer, from
+MLs~\cite{Coq,Kumar_2014}, Lisps and Schemes~\cite{Torlak_2013} to
+object-oriented systems~\cite{leino2008specification,leino2010dafny} and
+bare-metal assembly~\cite{Chlipala_2011} on top of which further abstractions
+can be built~\cite{Chlipala_2015}. While this variety appears to present
+overwhelming choice to the programmer who wishes to verify a program, reality
+belies a simpler problem: some languages and design decisions are better suited
+to certain problem domains than others. Correspondingly, certain proof logics
+are better suited to certain domains, and one often finds pairings between
+language and logic for the task at hand.
 
 I recommend a few starting points for programmers seeking a particular language
 style for their problems and discuss options available to those unsatisfied with
