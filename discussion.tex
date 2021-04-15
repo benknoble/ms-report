@@ -36,15 +36,15 @@ research is examining security properties and symbolic execution \`{a} la
 Rosette for hardware~\cite{zhang2018end}.
 
 In Section~\ref{S:t_interaction} we saw 3 types of verification tools
-(interactive, auto-active, and automatic). In our examples from
-Section~\ref{S:ex_ext}, we saw a comparison between one interactive proof and
-one auto-active proof, where both had benefits. Tools like Rosette and other
-push-button approaches bring yet more automation, at certain costs (\eg,
-finitization). Developing better automation tools for the interactive provers
-(\eg, Mtac~\cite{Kaiser_2018}, Iris proof mode~\cite{Krebbers_2017b}) will bring
-them closer to push-button tools, making them more accessible to an average
-developer. On the other hand, developing tools that provide more robust insights
-to the automatic provers (\eg,
+(interactive, auto-active, and automatic) and examples of proofs in each. In our
+examples from Section~\ref{S:ex_ext}, we saw a comparison between one
+interactive proof and one auto-active proof, where both had benefits. Tools like
+Rosette and other push-button approaches bring more automation, at certain
+costs (\eg, finitization). Developing better automation tools for the
+interactive provers (\eg, Mtac~\cite{Kaiser_2018}, Iris proof
+mode~\cite{Krebbers_2017b}) will bring them closer to push-button tools, making
+them more accessible to an average developer. On the other hand, developing
+tools that provide more robust insights to the automatic provers (\eg,
 profiling~\cite{Bornholt_2018,Porncharoenwase_2020}) can help the programmer
 solve automation-related problems, especially exponential path explosion, scale,
 and timeout-demons. In a related vein, we saw the use of \texttt{\{:opaque\}} to
@@ -53,34 +53,34 @@ struggles to rewrite under the existential quantifier, demonstrating needs for
 improvements on these facets of the system.
 
 Iris and Section~\ref{S:t_logic} demonstrated that proof logics (\eg, extensions
-to Hoare-logic) are still under active development: while systems often need to
-build their own proof logics, checking that they are sound is a difficult
+to Hoare-logic) are still under active development: although systems often need
+to build their own proof logics, checking that they are sound is a difficult
 process. Further, explaining and using them requires deep background. What new
 proof logics will we need to keep up with the state of programming technology?
 Iris was developed in part specifically for Rust; it also managed to position
 itself as a foundation for several older, more complex proof logics. As our
-language technology evolves, we will need increasingly sophisticated logics
-while we also hope to keep them accessible to the programmer writing proofs.
-Another possible direction here is to enable more rapid proof development:
-when developing a language model for a proof, like Rust, the programmer has to
-tie the syntax, semantics, and proof logic together. Facilitating these steps
-would help automate early development and allow the programmer to focus
-more on the proofs of interest. It would also enable a tighter feedback loop
-between model changes and proof updates.
+language technology evolves, we will need increasingly sophisticated logics. We
+also hope to keep them accessible to the programmer writing proofs. Another
+possible direction here is to enable more rapid proof development: when
+developing a language model for a proof, like Rust, the programmer has to tie
+the syntax, semantics, and proof logic together. Facilitating these steps would
+help automate early development and allow the programmer to focus more on the
+proofs of interest. It would also enable a tighter feedback loop between model
+changes and proof updates.
 
 Section~\ref{S:t_pl} mentions several programming languages or paradigms along
 with their accompanying verification tools. Bringing verification to more
 languages and more languages to verification will remain an open problem for as
 long as we continue to develop new programming languages. One technique for
-doing verifying new languages is to lift a non-verified language into an
+verifying new languages is to lift a non-verified language into an
 already-verified language~\cite{leino2008specification}. A particular challenge
 when modelling new languages is to verify that the model is accurate to the
 language specification and implementation; CompCert provides a reference
 interpreter~\cite{Kastner-LBSSF-2017} for that purpose, though doing so is
-challenging~\cite[Chs. \emph{Simple Imperative Programs}, \emph{An Evaluation
+challenging~\cite[Chs.\ \emph{Simple Imperative Programs}, \emph{An Evaluation
 Function for Imp}]{Pierce:SF1}. In a similar vein, verifying compilation or
 interpretation for more languages would bring increased confidence to systems
-using those languages. While avionics is one example of safety-critical
+using those languages. Although avionics is one example of safety-critical
 applications that relies on formal techniques, applications like financial
 software may not use them to their full extent, in part due to a lack of
 appropriate technology.
