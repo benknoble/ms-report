@@ -17,7 +17,7 @@ logic because in the cases I have studied they are the same (\eg, a Coq program
 proven in Coq~\cite{Coq}), one is encoded in the other (\eg, a
 Dafny~\cite{leino2010dafny} program proven by translation to
 Boogie~\cite{Barnett_2006,leino2008this}), or one is not relevant to the other
-(\eg, proofs in Iris's logic~\cite{Jung_2018b} use Iris's proof rules, while
+(\eg, proofs in Iris's logic~\cite{Jung_2018b} use Iris's proof rules, yet
 Iris is built on Coq). The encapsulation provided by many verifiers obviates a
 need to consider their underlying logics. Except in the case of a leaky
 abstraction~\cite{Spolsky_2002}, wherein the underlying verifier's logic leaks
@@ -48,7 +48,8 @@ Borrowing the terminology of~\cite[\S 2]{Nelson_2019}, I dissect this axis into
         proof, or produce a counter-example.
 \end{description}
 
-For each type, the reference~\cite{Nelson_2019} provides further examples.
+For each type, see \citeauthor{Nelson_2019}~\cite{Nelson_2019} for further
+examples.
 
 \subsubsection{Interactive verification}
 
@@ -113,22 +114,29 @@ we finish by selecting the \texttt{left} case and proving it (trivially, \(5 =
 
 \subsubsection{Auto-active verification}
 
+\begin{figure}[ht]
+    \includegraphics[width=\textwidth]{img/dafny_architecture}
+    \caption{Dafny compilation and verification
+    architecture~\cite{Herbert2012}}\label{F:dafny_arch}
+\end{figure}
+
 The approach taken by verifiers like Dafny~\cite{leino2010dafny}. The programmer
 annotates code both with specifications and proof hints, such as pre- or post-
 conditions or loop invariants. The verifier translates the source into a
 verification condition and uses a constraint solver to finish the verification.
-Some verifiers, such as Dafny, permit annotations that nearly rise to the level
-of proof texts like those of interactive verification, with composable theorems
-and lemmata in addition to functional specifications and standard annotations.
-While writing the proofs, though, the current state of the  goal and proof
-context are often hidden or implicit, since the verifier translates the goal and
-context for the constraint solver\footnote{The original goal and context are of
-course visible in the original statement being proven.}. A call-and-response
-effort is possible in such verifiers to complete a proof, but a major challenge
-is to discover what the automatic part of the verifier cannot prove and actively
+\figurename~\ref{F:dafny_arch} provides an overview of this architecture. Some
+verifiers, such as Dafny, permit annotations that nearly rise to the level of
+proof texts like those of interactive verification, with composable theorems and
+lemmata in addition to functional specifications and standard annotations. While
+writing the proofs, though, the current state of the  goal and proof context are
+often hidden or implicit, since the verifier translates the goal and context for
+the constraint solver\footnote{The original goal and context are of course
+visible in the original statement being proven.}. A call-and-response effort is
+possible in such verifiers to complete a proof, but a major challenge is to
+discover what the automatic part of the verifier cannot prove and actively
 provide effective hints to make progress. One power of this type of verifier is
 to free the programmer from all the details of the proof; the verifier often can
-handle simple statements on its own, while more complex statements can be proven
+handle simple statements on its own, and more complex statements can be proven
 with only a few well-directed hints. On the other hand, discovering which hints
 to use is like a game of ``20 Questions''\footnote{The programmer asks ``Would
 you be able to make progress on the proof if I could convince you of \(P\)?''
@@ -160,7 +168,7 @@ method Main() {
     invoking the Dafny compiler.}\label{F:dafny_ex}
 \end{figure}
 
-The example proofs (\(\forall P, P \implies P\) and \(5\) is in a long list
+The example proofs (\(\forall P: P \implies P\) and \(5\) is in a long list
 containing \(5\)) in Dafny are completely automatically checked by the Dafny
 compiler, as shown in \figurename~\ref{F:dafny_ex}. However, let's add the
 \(\func{IsPrime}\) predicate. Dafny can automatically find proofs for the
@@ -220,7 +228,7 @@ Hyperkernel \gls{os}~\cite{Nelson_2017}.
 \end{figure}
 
 \figurename~\ref{F:rosette} demonstrates the same proofs from before, and a
-proof that \(\forall x, \abs{x} \ge 0\), all of which are accomplished
+proof that \(\forall x: \abs{x} \ge 0\), all of which are accomplished
 completely automatically by Rosette. In particular, the primality and membership
 proofs use Rosette's partial evaluation, so that the statements are effectively
 proving a constant truth value.
@@ -325,7 +333,7 @@ state, such as ``In state \(\sigma\), \(X\) is 1.''
 The triple states that, if \(P\) is established, executing \(C\) establishes
 \(Q\) (or \(C\) does not terminate). This statement can thus be written using
 notation from \figurename~\ref{F:Imp_ex}, with \(P\) and \(Q\) assertions about
-the state of the program,
+the state of the program. We write \(\definedas\) to indicate a definition.
 
 \begin{align*}
     \{P\} C \{Q\} \definedas \forall \sigma_1, \sigma_2 &: \comp{c}\sigma_1 \DownTo \sigma_2 &\text{if \(\mathtt{c}\) terminates} \\
@@ -415,9 +423,10 @@ way, but such information may not be needed. It is convenient to avoid
 unnecessarily strengthening pre-conditions in the overall program statement, as
 they might unnecessarily restrict the proof's application to the program. An
 example will clarify: consider \(\{X = 1\}X \gets X + 1\{X > 0\}\) with \(X \in
-\Z\). Clearly, the precondition is sufficient to establish the post-condition,
-but proving this triple only establishes the program's correctness when \(X =
-1\). If we are interested in more than this narrow situation, we need a weaker
+\Z\) and the command \(X \gets n\) indicating assignment of \(n\) to \(X\).
+Clearly, the precondition is sufficient to establish the post-condition, but
+proving this triple only establishes the program's correctness when \(X = 1\).
+If we are interested in more than this narrow situation, we need a weaker
 pre-condition; otherwise, we are constrained to only trusting the program when
 \(X = 1\) holds. In this particular case, we only need to know that \(X + 1 >
 0\), \ie, \(X \ge 0\). Now our program is provably correct in many more cases.
@@ -430,7 +439,7 @@ in~\cite{leino2008specification}). The intuitive idea is that for some statement
 non-\(\bot\) information we need to correctly establish \(Q\), \ie, such that
 the triple \(\{\wpre{C,Q}\} C \{Q\}\) is provable and the pre-condition is not
 \(\bot\). Formally, \(P\) is a weakest pre-condition with respect to \(C\) and
-\(Q\) (\(P = \wpre{C,Q}\)) iff \(\{P\} C \{Q\}\) and \(\forall P', \{P'\} C
+\(Q\) (\(P = \wpre{C,Q}\)) iff \(\{P\} C \{Q\}\) and \(\forall P': \{P'\} C
 \{Q\} \implies (P' \TO P)\).
 
 The function \(\func{wp}\) is computable by structural induction on
@@ -467,7 +476,7 @@ reasoning about pointers and data-structures. The separation of state also
 facilitates local reasoning---the correctness of a part of the program is
 allowed to depend only on the part of the state it uses. Once that part of the
 program is proven correct, we can separately extend the used state with unused
-state via the frame rule. The extension does not affecting correctness and
+state via the frame rule. The extension does not affect correctness and
 guarantees that the unused part of the extended state is not modified by the
 program. \figurename~\ref{F:frame} demonstrates the frame rule; notice the side
 condition that none of the variables modified by \(C\) are free in \(R\).
@@ -558,11 +567,11 @@ like Rosette~\cite{Rosette}.
 For the unsatisfied, Rosette promises the ability to build automatic
 solver-aided languages suited to the problem at hand~\cite{Torlak_2013}. For
 those seeking an auto-active style, the discussion
-in~\cite{leino2008specification} offers a design for an object-oriented language
-that could be adapted. When building a verifier for a completely interactive
-environment, building on top of existing verifiers is the norm. It is always
-possible to build a translator targeting a higher-level verified language---the
-programmer thus has complete control of the surface language, at the cost of
-building, maintaining, and perhaps verifying a compiler. The ease of such an
-effort depends on how well the languages semantics match; syntax is a matter of
-appropriate translation.
+in~\cite{leino2008specification,Ahmadi_2014} offers a design for an
+object-oriented language that could be adapted. When building a verifier for a
+completely interactive environment, building on top of existing verifiers is the
+norm. It is always possible to build a translator targeting a higher-level
+verified language---the programmer thus has complete control of the surface
+language, at the cost of building, maintaining, and perhaps verifying a
+compiler. The ease of such an effort depends on how well the languages semantics
+match; syntax is a matter of appropriate translation.
