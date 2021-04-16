@@ -1,14 +1,14 @@
 \section{Discussion}\label{S:discussion}
 
 Having given an overview on verified programming and the tools used to build
-verified programming languages, I turn now to the frontier of the science: what
+verified programming languages, we turn now to the frontier of the science: what
 challenges lie ahead? What open problems need answers?
 
 We saw in Section~\ref{S:stack} that today's programming environment is more
 expansive than a single program on a single machine.
 IronClad~\cite{hawblitzel2014ironclad} and
 IronFleet~\cite{hawblitzel2015ironfleet} address full-stack distributed
-verification, but I have not found any research on build-pipeline or deployment
+verification, but we have not found any research on build-pipeline or deployment
 verification, nor on containerization, orchestration, and the like. On the one
 hand, we might hope that deployment steps are simple enough that the
 cost-benefit ratio of formal verification indicates the effort is not worth the
@@ -120,7 +120,7 @@ raises questions about integrating proof-developments into live software like
 the Linux kernel, where a clean-slate approach is impossible. They also
 reinforce the challenge of symbolic execution. One facet of the Jitterbug
 development involved reasoning across different verifiers (in particular,
-interactive and automatic), an area which has seen little research to my
+interactive and automatic), an area which has seen little research to our
 knowledge. Serval examined the challenge of separating implementation and
 verification while maintaining the necessary connections~\cite{Nelson_2019}.
 Bedrock, in a vein similar to Serval and CompCert, took one of the first looks

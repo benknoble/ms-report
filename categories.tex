@@ -1,19 +1,19 @@
 \section{Categorizing Verified Programming Tools}\label{S:categories}
 
-I propose 3 axes along which to classify the tools used to verify programs.
-These are
+This report proposes 3 axes along which to classify the tools used to verify
+programs. These are
 \begin{enumerate}
     \item the type of interaction;
     \item the type of proof logic; and
     \item the type of programming languages.
 \end{enumerate}
 
-I examine each in turn in Sections~\ref{S:t_interaction},~\ref{S:t_logic},
+We examine each in turn in Sections~\ref{S:t_interaction},~\ref{S:t_logic},
 and~\ref{S:t_pl}.
 
 One might also include the logic of the underlying verifier, especially in cases
-where it differs from the proof logic. I choose not to include the verifier's
-logic because in the cases I have studied they are the same (\eg, a Coq program
+where it differs from the proof logic. We choose not to include the verifier's
+logic because in the cases we have studied they are the same (\eg, a Coq program
 proven in Coq~\cite{Coq}), one is encoded in the other (\eg, a
 Dafny~\cite{leino2010dafny} program proven by translation to
 Boogie~\cite{Barnett_2006,leino2008this}), or one is not relevant to the other
@@ -33,7 +33,7 @@ handbook~\cite{biere2009handbook}).
 
 In the context of a verified programming tool, ``interaction'' means that
 between the programmer and the verifier: what is necessary to formulate proofs?
-Borrowing the terminology of~\cite[\S 2]{Nelson_2019}, I dissect this axis into
+Borrowing the terminology of~\cite[\S 2]{Nelson_2019}, we dissect this axis into
 3 major types of interaction.
 \begin{description}
     \item[Interactive tools.] The programmer manually constructs the proof by
@@ -170,7 +170,7 @@ method Main() {
 
 The example proofs (\(\forall P: P \implies P\) and \(5\) is in a long list
 containing \(5\)) in Dafny are completely automatically checked by the Dafny
-compiler, as shown in \figurename~\ref{F:dafny_ex}. However, let's add the
+compiler, as shown in \figurename~\ref{F:dafny_ex}. Let's also add the
 \(\func{IsPrime}\) predicate. Dafny can automatically find proofs for the
 primality of 0, 1, 2, and 3. At 6, however, Dafny doesn't know what to do, and
 the hint \(6 \mod 3 = 0\) is necessary to prove 6 is not prime. Removing the
@@ -257,7 +257,7 @@ developer the meaning of the results in the program domain.
 A full account of proof logics for programs would be a long paper in its own
 right and is out of scope for this report. Look no further than
 \figurename~\ref{F:iris_complex} to see how complicated the topology of (a
-subset of) proof logics can be. Instead, I will mention a key proof logic
+subset of) proof logics can be. Instead, we will discuss a key proof logic
 (namely, Hoare logic) and some of its extensions. For another explanation of
 program and proof logics and their uses, see~\cite[\S 5]{Appel_2011}.
 
@@ -336,7 +336,7 @@ notation from \figurename~\ref{F:Imp_ex}, with \(P\) and \(Q\) assertions about
 the state of the program. We write \(\definedas\) to indicate a definition.
 
 \begin{align*}
-    \{P\} C \{Q\} \definedas \forall \sigma_1, \sigma_2 &: \comp{c}\sigma_1 \DownTo \sigma_2 &\text{if \(\mathtt{c}\) terminates} \\
+    \{P\} C \{Q\} \definedas \forall \sigma_1, \sigma_2 &: \comp{C}\sigma_1 \DownTo \sigma_2 &\text{if \(\mathtt{C}\) terminates} \\
     &\implies P\, \sigma_1 &\text{and if \(P\, \sigma_1\) holds} \\
     &\implies Q\, \sigma_2 &\text{then we can establish \(Q\, \sigma_2\) holds.}
 \end{align*}
@@ -347,7 +347,7 @@ is a hypothesis in the Hoare triple, showing \(C\) does not terminate leads to a
 contradiction, from which we can derive \(\bot\). Hoare logic permits reasoning
 about partial correctness; termination must be proven
 separately\footnote{Various sources claim it is possible to give rules for total
-correctness; the most complete rule I have seen involves bounding loops with a
+correctness; the most complete rule we have seen involves bounding loops with a
 well-founded order.}.
 
 This is a model-theoretic Hoare logic: the proof rules are stated in terms of
@@ -393,9 +393,9 @@ the beginning. A selection of rules are presented in
 analogous to implication: the definition is \(\forall \sigma: P\, \sigma
 \implies P'\, \sigma\).
 
-I should note that, although Hoare logics are mostly seen for imperative
-programming languages, they are also applicable to functional languages. For
-example, Iris~\cite[\S 5.1]{Krebbers_2017b} and the RustBelt project~\cite[\S
+Note that, although Hoare logics are mostly seen for imperative programming
+languages, they are also applicable to functional languages. For example,
+Iris~\cite[\S 5.1]{Krebbers_2017b} and the RustBelt project~\cite[\S
 3.2, esp. \figurename~3]{Jung_2018a} have demonstrated the applicability of a
 particular kind of Hoare logic to both \(\lambda\)-calculus style and ML-like
 languages.
@@ -465,19 +465,19 @@ logic}~\cite{Reynolds}.
 The crucial extension is to differentiate between the assertion \(P \land Q\),
 which denotes that both conjuncts hold on the current state, and the assertion
 \(P * Q\), which denotes that each conjunct holds on a disjoint part of the
-current state. In other words, the state \(s\) can be split into \(\sigma_1,
-\sigma_2\) (often written \(\sigma = \sigma_1 \uplus \sigma_2\)) such that \(P\)
-holds on \(\sigma_1\) and \(Q\) holds on \(\sigma_2\). Along with rules for
-manipulating this new separating conjunction, the programmer gains the ability
-to reason about separate parts of the store or state. Other important rules in
-separation logics correspond to framing the state needed by execution of the
-program and address- and pointer- manipulation. Together, these rules facilitate
-reasoning about pointers and data-structures. The separation of state also
-facilitates local reasoning---the correctness of a part of the program is
-allowed to depend only on the part of the state it uses. Once that part of the
-program is proven correct, we can separately extend the used state with unused
-state via the frame rule. The extension does not affect correctness and
-guarantees that the unused part of the extended state is not modified by the
+current state. In other words, the state \(\sigma\) can be split into
+\(\sigma_1, \sigma_2\) (often written \(\sigma = \sigma_1 \uplus \sigma_2\))
+such that \(P\) holds on \(\sigma_1\) and \(Q\) holds on \(\sigma_2\). Along
+with rules for manipulating this new separating conjunction, the programmer
+gains the ability to reason about separate parts of the store or state. Other
+important rules in separation logics correspond to framing the state needed by
+execution of the program and address- and pointer- manipulation. Together, these
+rules facilitate reasoning about pointers and data-structures. The separation of
+state also facilitates local reasoning---the correctness of a part of the
+program is allowed to depend only on the part of the state it uses. Once that
+part of the program is proven correct, we can separately extend the used state
+with unused state via the frame rule. The extension does not affect correctness
+and guarantees that the unused part of the extended state is not modified by the
 program. \figurename~\ref{F:frame} demonstrates the frame rule; notice the side
 condition that none of the variables modified by \(C\) are free in \(R\).
 
@@ -549,7 +549,7 @@ to certain problem domains than others. Correspondingly, certain proof logics
 are better suited to certain domains, and one often finds pairings between
 language and logic for the task at hand.
 
-I recommend a few starting points for programmers seeking a particular language
+We recommend a few starting points for programmers seeking a particular language
 style for their problems and discuss options available to those unsatisfied with
 the existing languages.
 

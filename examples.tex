@@ -1,19 +1,17 @@
 \section{Learning by example}\label{S:examples}
 
-% TODO I/we and tenses are all over the place
-
-I begin with an extended example comparing two proofs of different systems in
-different verification environments (Section~\ref{S:ex_ext}). I then briefly
+We begin with an extended example comparing two proofs of different systems in
+different verification environments (Section~\ref{S:ex_ext}). We then briefly
 discuss a few other examples (Section~\ref{S:ex_notable}) and point towards a
 plethora of other verified programs research (Section~\ref{S:ex_reading}).
 
 \subsection{Extended example: distributed hash tables and regular
 expressions}\label{S:ex_ext}
 
-I have previously written two proofs of sufficient size and complexity that
-their study will demonstrate both common proof techniques and challenges. I will
+We have previously written two proofs of sufficient size and complexity that
+their study will demonstrate both common proof techniques and challenges. We will
 not provide all the details, in part because both were completed for academic
-exercises and I wish to avoid publishing full solutions, and in part because
+exercises and We wish to avoid publishing full solutions, and in part because
 some details are not relevant for the discussion here (proof scripts and
 programs available on request). It is important to note that in one case, there
 is no final executable program; rather, the proof is written entirely in a
@@ -24,7 +22,7 @@ agreement with the relational definition.
 The first proof is that a (somewhat idealized) distributed hash table behaves
 like a logically centralized hash table; this was modeled and proved in
 Dafny~\cite{leino2010dafny} for the 2020 Systems Software Verification Summer
-School~\cite{Kapritsos_2020}. I defer details on hash tables to classic texts
+School~\cite{Kapritsos_2020}. We defer details on hash tables to classic texts
 like~\cite{CLRS}. This proof has no final executable.
 
 The second proof is that a regular expression matching algorithm based on
@@ -37,19 +35,20 @@ in~\cite{Might_Yacc,Might_desugar,Might_deriv}. This proof does define a
 matching function that can be extracted to OCaml, Haskell, or Scheme;
 see~\cite{Coq_Extract} or~\cite[Extraction]{Pierce:SF1} for details.
 
-I present the examples by following the chronology of their development. First,
-I develop a model of the theory (Section~\ref{S:ex_theory}). Second, I model the
-program to be verified (Section~\ref{S:ex_program}). Third, I write down the
-formal specification (Section~\ref{S:ex_spec}). Finally, I prove by induction
-that the models implement the specification (Section~\ref{S:ex_ind}).
+We present the examples by following the chronology of their development. First,
+we develop a model of the theory (Section~\ref{S:ex_theory}). Second, we model
+the program to be verified (Section~\ref{S:ex_program}). Third, we write down
+the formal specification (Section~\ref{S:ex_spec}). Finally, we sketch a proof
+by induction that the models implement the specification
+(Section~\ref{S:ex_ind}).
 
 \subsubsection{Model of the theory}\label{S:ex_theory}
 
-Here I develop the necessary theories of hash tables and regular expressions.
+Here we develop the necessary theories of hash tables and regular expressions.
 They will be needed especially for the formal specification
 (Section~\ref{S:ex_spec}) and proof (Section~\ref{S:ex_ind}).
 
-\paragraph{Hash table.} My theory of hash tables is to use a full Dafny map,
+\paragraph{Hash table.} Our theory of hash tables is to use a full Dafny map,
 specifically an infinite map from integers to integers. This means every
 possible integer key maps to a value; the default is 0. We specify two
 relations: the initial state and the possible transitions. This gives us an
@@ -74,7 +73,7 @@ property will show up later in other models and is crucial to correctness.
 Without this statement, \(\var{state'}\) could be any possible state after a get
 operation is performed.
 
-In Dafny, I also define
+In Dafny, we also define
 \begin{inlist}
 \item a sum-type Step capturing the non-stateful parameters of the transitions
     (here, \(\func{GetStep}\) and \(\func{PutStep}\) capture a key-value pair
@@ -92,8 +91,8 @@ predicates to induction, but we can still structure the remaining proofs
 inductively and be confident in their correctness.
 
 \paragraph{Regular Expressions.} Coq supports the type of inductive relations
-I've used for hash tables; for the theory of regular expressions I will define
-what a regular expression is and how a string matches one. I define an inductive
+used for hash tables; for the theory of regular expressions we will define what a
+regular expression is and how a string matches one. We define an inductive
 datatype \(\func{regexp}\), parameterized on the type \(T\) of strings, with the
 usual alternatives. Below, \(\epsilon\) is the regular expression for the empty
 string, not to be confused with the empty regular expression \(\emptyset\),
@@ -109,16 +108,16 @@ which matches no strings.
     & |\; \func{Star}(\var{re}: \func{regexp}(T)).
 \end{align*}
 
-I also need a theory of ``matching'': what does it mean for a string to match a
-regular expression? I write \(s \matches r\) for the assertion that a string
+We also need a theory of ``matching'': what does it mean for a string to match a
+regular expression? We write \(s \matches r\) for the assertion that a string
 \(s\) is a list of \(T\)s matching a regular expression \(r\) over the type
-\(T\). At this point, there are several options. I could use a reference
-implementation and prove that my derivative matcher is equivalent; this requires
-that we have a reference implementation, and it still needs to be verified. I could
-construct finite automata and write proofs about graphs; according
-to~\cite{Morrisett_2012} graphs are unwieldy in Coq. Instead, I'll stick with
-induction and define the rules for matching as an inductive proposition. I write
-\(s_1 \texttt{++} s_2\) for string concatenation.
+\(T\). At this point, there are several options. We could use a reference
+implementation and prove that out derivative matcher is equivalent; this
+requires that we have a reference implementation, and it still needs to be
+verified. We could construct finite automata and write proofs about graphs;
+according to~\cite{Morrisett_2012} graphs are unwieldy in Coq. Instead, we will
+stick with induction and define the rules for matching as an inductive
+proposition. We write \(s_1 \texttt{++} s_2\) for string concatenation.
 
 \begin{mathparpagebreakable}
     \inference[\iname{MEmpty}]{}{[] \matches \epsilon}
@@ -139,7 +138,7 @@ induction and define the rules for matching as an inductive proposition. I write
 \end{mathparpagebreakable}
 
 Because these are inductive definitions, Coq automatically generates induction
-principles for use in proofs. Thus I define the problem-domain inductively,
+principles for use in proofs. Thus we define the problem-domain inductively,
 again.
 
 These definitions can be read analogously to the relational predicates
@@ -157,18 +156,18 @@ reasoning by induction to handle the infinite.
 
 \subsubsection{Model of the program}\label{S:ex_program}
 
-Here I develop programs for distributed hash table communication and
+Here we develop programs for distributed hash table communication and
 regular expression matching. It is these programs that we wish to prove
 implement specifications of the above theories.
 
-\paragraph{Distributed Hash table.} I need a number of definitions to represent
-the network and hosts that will communicate. I begin by axiomatizing the number
+\paragraph{Distributed Hash table.} We need a number of definitions to represent
+the network and hosts that will communicate. We begin by axiomatizing the number
 of hosts to be some fixed but unknown \(n\) and gathering the set of ids where
-\(0 \le id < n\). Next, I model the network: in its idealized representation, it
+\(0 \le id < n\). Next, we model the network: in its idealized representation, it
 sends messages only once. The network is \emph{also} an inductive state machine;
 each step consists of an \(\func{Action}\) representing an optional message for
 a host to receive, which must have been sent, and a set of messages to be
-delivered in the future. I then abstractly model a distributed system in this
+delivered in the future. We then abstractly model a distributed system in this
 network: the system requires definitions for the message and host types, as well
 as inductive state machine predicates for the host (\(\func{HostInit}\) and
 \(\func{HostNext}\)). Each host is told its id by the distributed system. It
@@ -178,7 +177,7 @@ initialized. The transition is taken by only a single host at a time, in
 lock-step with the network; that is, the abstract system's \(\func{Next}\)
 predicate keeps all hosts but one the same---that host is given to
 \(\func{HostNext}\), and the network to the corresponding \(\func{NetNext}\).
-Finally, to conclude the program, I define a host for use in the distributed
+Finally, to conclude the program, we define a host for use in the distributed
 hash table and instantiate the abstract distributed system accordingly. Host 0
 starts with the entire hash table (all keys mapped to 0). The other hosts are
 empty. The predicates and types for \(\func{HostNext}\) incorporate a network
@@ -200,7 +199,7 @@ and \(\func{Put}\):
     & \land \var{action.send} = \emptyset && \text{No messages sent.}
 \end{alignat*}
 
-In order for the distributed system to do anything interesting, I also include
+In order for the distributed system to do anything interesting, we also include
 the ability to send and receive hash tables. Note that in \(\func{Receive}\) the
 receiving host will prefer its own key-value pair to one in the message when the
 keys are the same (\ie, in case of conflict, the recipient takes precedence).
@@ -229,7 +228,7 @@ inductive state machine relation as that of the original hash table. The key
 differences are network and distributed system abstractions and their
 incorporation into the host state machine. The use of abstract models makes the
 model more reusable and enables layering---proofs about low-level systems can be
-easily composed with proofs about the high-level via refinement, which I will
+easily composed with proofs about the high-level via refinement, which we will
 discuss in Section~\ref{S:ex_spec}. We say that the distributed hash table model
 \emph{refines} the distributed system model.
 
@@ -251,7 +250,7 @@ regular expression's derivative with respect to the characters in the string;
 only if the final expression matches the empty string is the result considered a
 match. More details on the algorithm and definitions are
 in~\cite{Might_Yacc,Might_desugar,Might_deriv}. To formalize these definitions
-in Coq, I write three recursive functions that compute a fix-point. The first
+in Coq, we write three recursive functions that compute a fix-point. The first
 tests whether or not a regular expression matches the empty string in the
 obvious way:
 
@@ -295,17 +294,17 @@ The third implements our matching algorithm:
     \func{Match}(a+w, r) &= \func{Match}(w, \func{D}_a(r))
 \end{align*}
 
-It may not appear that I used inductive definitions to model our regular
+It may not appear that we used inductive definitions to model our regular
 expression matching program, but the close relationship between recursive
-functions and induction hints at the nature of our program. Indeed, as I have
+functions and induction hints at the nature of our program. Indeed, as we have
 already stated, the equivalence proofs will all be by induction. Pay attention
 to the inductive structure of the functions: \(\func{Empty}\) and \(\func{D}\)
 are recursive on the regular expression; in contrast, \(\func{Match}\) is
 recursive on the string. This is a strong clue for the proof-writer about the
 direction to take in the actual proof.
 
-The two programs are noticeably different: in one, I define another
-state machine in terms of relations between states. In the other, I provide
+The two programs are noticeably different: in one, we define another
+state machine in terms of relations between states. In the other, we provide
 computable functions over data. Yet the proofs will have striking similarities.
 Besides the key difference of executability, there is also a difference in
 abstraction level. The hash table example models an idealized network and an
@@ -322,7 +321,7 @@ definition of the matches relation.
 
 \subsubsection{Formal specification}\label{S:ex_spec}
 
-In this section I discuss the specification the two programs must meet, first
+In this section we discuss the specification the two programs must meet, first
 informally and then formally.
 
 \paragraph{Hash table.} Informally, we would like the distributed hash table
@@ -342,13 +341,13 @@ There is a subtle problem with the strict equivalence above: notice that, if the
 program is correct, \(\func{Send}\) and \(\func{Receive}\) in the distributed
 system should not change the overall state of the collective key-value pairs.
 There is no corresponding state change in the single hash table. To overcome
-this challenge, I introduce the notion of a \emph{stutter step}. This is a faux
+this challenge, we introduce the notion of a \emph{stutter step}. This is a faux
 state change wherein the state is actually unchanged. The actual
 correctness criterion is that whenever the distributed system takes a step via
 its \(\func{Next}\) predicate, the single hash table either also takes a step or
 remains the same (a stutter step).
 
-I formalize this in two proof obligations, or theorems, about the program. Let
+We formalize this in two proof obligations, or theorems, about the program. Let
 the function \(I\) be an interpretation function mapping distributed system
 state into single hash-table state. The theorems resemble the two stages of
 induction: a base case (Theorem~\ref{Th:h_init}) and an inductive case
@@ -357,9 +356,9 @@ induction: a base case (Theorem~\ref{Th:h_init}) and an inductive case
 predicate \(\func{Inv}\) that is maintained by their program. The goal is for
 \(\func{Inv}\) to imply the desired safety or correctness properties; it is also
 allowed to contain other additional invariants. In many cases these additional
-invariants is necessary to correctness.
+invariants are necessary to correctness.
 
-Below, I will use the subscript \(D\) to represent functions and propositions
+Below, we will use the subscript \(D\) to represent functions and propositions
 about the distributed system, and \(S\) for the same about the single hash
 table.
 
@@ -414,11 +413,11 @@ correctly implement matching; that is, \(\func{Match}(s, r)\) should be
 boolean and the matches relation is a proposition, which is, in general,
 undecidable. The two are not directly compatible with connectives like \(\iff\);
 that is, we cannot write \(\forall s, r: \func{Match}(s, r) \iff s \matches r\)
-as our specification. I could instead use the proposition \(\func{Match}(s, r) =
-\true\), but I choose to use a technique called ``proof by reflection.'' The
+as our specification. We could instead use the proposition \(\func{Match}(s, r) =
+\true\), but we choose to use a technique called ``proof by reflection.'' The
 idea is that some propositions are in fact decidable; as a witness, we provide a
 predicate that computes the truth value. The predicate is said to \emph{reflect}
-the proposition. I will write \(b \reflects P\) in these cases; note that
+the proposition. We will write \(b \reflects P\) in these cases; note that
 implicitly \(\neg b \reflects \neg P\). To prove such a claim, we must show that
 in each possible case of the computation of \(b\), the proposition \(P\) is
 provable or derives a contradiction. We are able to make use of the (proved)
@@ -451,7 +450,7 @@ correctness theorem for \(\func{Empty}\) is simple:
     \(\func{Empty}(r) \reflects [] \matches r\).
 \end{lem}
 
-For the derivative, we need to formalize what it means to be a derivative. I
+For the derivative, we need to formalize what it means to be a derivative. We
 define the relation \(\Delta\) between two regular expressions \(r\) and \(r'\)
 with respect to character \(a\) as for all strings \(s\), \(a+s \matches r \iff
 s \matches r'\). That is, \(\Delta(r, a, r')\) is provable exactly when \(r'\)
@@ -465,14 +464,14 @@ for \(\func{D}\) is stated as:
 In this example we also need auxiliary correctness statements; we will see
 analogues in the hash-table proof. The difference is that, from our development
 of the \(\func{Match}\) function, we know we need \(\func{Empty}\) and
-\(\func{D}\) to be correct. In the hash table case, I've hidden some of the
-analogous functions in notation---I end up needing information about table union
-and removal, fullness, disjointness, and the location of tables in order to
-complete the proof.
+\(\func{D}\) to be correct. In the hash table case, we have hidden some of the
+analogous functions in notation---we end up needing information about table
+union and removal, fullness, disjointness, and the location of tables in order
+to complete the proof.
 
 \subsubsection{Proof by induction}\label{S:ex_ind}
 
-Finally we come to the proofs. I will omit the details and focus on a few key
+Finally we come to the proofs. We will omit the details and focus on a few key
 ideas.
 
 In the case of the hash table proof, we are interested in the following: first,
@@ -486,26 +485,26 @@ In the case of regular expressions, we are interested in the following: first,
 there is a clever technique to simplify the reflection proof. We relate the
 \(\matches\) judgements to propositions involving the usual connectives. As a
 challenge, however, Coq struggles to apply theorems under existential
-quantifiers. Second, though not used to its full extent in my proof script, Coq
+quantifiers. Second, though not used to its full extent in our proof script, Coq
 allows expressive proof-automation, albeit not as automatically as Dafny. Third,
-the Coq proof is entirely interactive, so that I know exactly what context I am
-in and what the goals are at any time. This can make it easier to reason about
-complex state, as I am not guessing what the system looks like.
+the Coq proof is entirely interactive, so that we know exactly what context we
+are in and what the goals are at any time. This can make it easier to reason
+about complex state, as we are not guessing what the state looks like.
 
 \paragraph{Hash table.} Looking at our two proof obligations,
 Theorem~\ref{Th:h_init} seems the easier of the two: we need to prove that
 \(\func{Init}_{D}\) is correct with respect to \(\func{Init}_{S}\) and that it
-establishes the invariants (disjointness and fullness). After I write the
-statement of the theorem, Dafny asks for a proof. I first let it attempt to fill
-in the details, leaving the body blank; Dafny complains that the two
+establishes the invariants (disjointness and fullness). After we write the
+statement of the theorem, Dafny asks for a proof. We first let it attempt to
+fill in the details, leaving the body blank; Dafny complains that the two
 post-conditions (correctness and the invariants) may not hold. This is Dafny's
-way of telling me that it can't work out all the details. By examining the
-definition of \(\func{Init}_{S}\), I know I need to first show that \(I\) maps
-the initial distributed state to the initial single state. Logically, I know
+way of telling us that it cannot work out all the details. By examining the
+definition of \(\func{Init}_{S}\), we know we need to first show that \(I\) maps
+the initial distributed state to the initial single state. Logically, we know
 that one host contains the full 0-table, and the other hosts' tables are empty,
-so they shouldn't contribute to the result. I also know there is nothing on the
-network. I ask Dafny: if I can prove these few facts, will you believe
-correctness of \(\func{Init}\)? To do so, I \texttt{assert} the following facts
+so they shouldn't contribute to the result. We also know there is nothing on the
+network. We ask Dafny: if we can prove these few facts, will you believe
+correctness of \(\func{Init}\)? To do so, we \texttt{assert} the following facts
 without proof:
 \begin{itemize}
     \item the host with id 0 contains a table mapping all keys to 0;
@@ -514,43 +513,43 @@ without proof:
         tables is the non-empty table;
     \item there are no messages on the network; and therefore
     \item \(I\) maps the initial distributed state to the initial single state
-        by considering a table-union of a single full 0-table with empty-tables.
+        by considering a table-union of a single full 0-table with empty tables.
 \end{itemize}
 Indeed, at this point, Dafny no longer complains that the \(\func{Init}_{S}\)
 post-condition cannot be established. However, it does flag some (not all!) of
-the assertions as not established. In other words, if I can prove the remaining
-assertions, I will have successfully given Dafny enough to finish part of the
+the assertions as not established. In other words, if we can prove the remaining
+assertions, we will have successfully given Dafny enough to finish part of the
 proof. Dafny observes on its own all of the facts except that empty tables do
-not contribute to a table-union. I state this as a separate lemma and play
+not contribute to a table-union. We state this as a separate lemma and play
 another round of 20-questions with Dafny: what will it take to convince you?
-Briefly, I am able to complete the proof via an inductive structure that mimics
-the recursive nature of the table-union function---I am able to invoke the lemma
-I am proving in the recursive case, much like a recursive function call. An
+Briefly, we are able to complete the proof via an inductive structure that
+mimics the recursive nature of the table-union function---we invoke the lemma we
+are proving in the recursive case, much like a recursive function call. An
 important auxiliary lemma in the proof is that the table-union of empty tables
 is also empty: this has no proof body, for Dafny can observe its truth entirely
-automatically. I still need to show the invariants, but fullness follows from
+automatically. We still need to show the invariants, but fullness follows from
 the establishment of \(\func{Init}_{S}\), and the tables are also clearly
-disjoint by similar reasoning; Dafny fills in most of these details for me.
+disjoint by similar reasoning; Dafny fills in most of these details.
 
-The proof of Theorem~\ref{Th:h_ind} is similar in many respects: I ask Dafny if
-it can prove the required definitions automatically; where it cannot, I start
+The proof of Theorem~\ref{Th:h_ind} is similar in many respects: we ask Dafny if
+it can prove the required definitions automatically; where it cannot, we start
 unfolding definitions and \texttt{assert}ing facts until Dafny has enough
-information. Then, I supply proofs for the assertions. I also have to reason by
-case-analysis on the possible steps for the distributed system (recall from
+information. Then, we supply proofs for the assertions. We also have to reason
+by case-analysis on the possible steps for the distributed system (recall from
 Section~\ref{S:ex_program} the steps \(\func{Get}\), \(\func{Put}\),
 \(\func{Send}\), and \(\func{Receive}\)). Some cases require more details then
-others; I wind up needing auxiliary statements like ``if all the tables are
+others; we wind up needing auxiliary statements like ``if all the tables are
 disjoint, then the table that owns the key controls the value that the key maps
 to in the table-union'' and ``the invariants disjointness and fullness imply
 that the union is also full'' (both of which Dafny fills in almost
 automatically). Similarly, with little assistance Dafny can see that a
 \(\func{Put}\) step keeps full maps full. However, as the proof starts to get
 larger, and the more complicated details are filled in, Dafny's checker gets
-slower and slower. It eventually grinds to a halt---I, the programmer,
-am left with a tool that should be mostly automatic but has effectively stopped
-its dialogue with me. What went wrong?
+slower and slower. It eventually grinds to a halt---we, the programmers, are
+left with a tool that should be mostly automatic but has effectively stopped its
+dialogue with us. What went wrong?
 
-By limiting the time spent per proof, I identify that I am stuck in Dafny's
+By limiting the time spent per proof, we identify that we are stuck in Dafny's
 ``timeout demon.'' A full tutorial on profiling Dafny execution to identify the
 source of the timeout is out of scope; see
 \citeauthor{Kapritsos_2020}~\cite{Kapritsos_2020} for details. The source of the
@@ -572,10 +571,10 @@ universal-existential pair, leading to similar explosions or slowdowns. The
 resolution in both cases is to mark the definitions \texttt{\{:opaque\}}, an
 annotation that prevents Dafny from unfolding the definitions except when
 explicitly \texttt{reveal}ed---this gives the programmer more control over the
-scope of the definitions, but closes off an avenue of automation. Now, I have to
+scope of the definitions, but closes off an avenue of automation. Now, we have to
 rework previously acceptable proofs to reveal definitions at the key steps so
-that Dafny can see I have satisfied them. When filling in these details, as
-before, I am not shown the exact proof state, and have to continue parts of the
+that Dafny can see we have satisfied them. When filling in these details, as
+before, we are not shown the exact proof state, and have to continue parts of the
 20-questions game.
 
 This concludes our short tour of Dafny via distributed hash tables. We saw how
@@ -619,7 +618,7 @@ These propositions end up being more amenable to use with the induction
 hypotheses. However, we run into trouble with \(\func{App}\) and
 \(\func{Star}\). Their logical equivalents involve the use of the existential
 quantifier; Coq's constructive logic requires us to give a witness to complete
-the proof. As an example, I give the lemma for \(\func{App}\) with a non-empty
+the proof. As an example, we give the lemma for \(\func{App}\) with a non-empty
 string.
 % \begin{lem}
 %     For all strings \(s\) and regular expressions \(\var{left}, \var{right}\),
@@ -685,15 +684,15 @@ H : ([ ] =~ re1) /\ s =~ derive a re2
 
 One useful feature of Coq, particularly in the proof of correctness of
 \(\func{D}\), is the interactive state. As a rather verbose example that also
-demonstrates the rewrite-under-existential issue above, I show a sample from the
+demonstrates the rewrite-under-existential issue above, we show a sample from the
 correctness proof of \(\func{D}\) in the \(\func{App}\) case in
 \figurename~\ref{F:r_derive}. Note how Coq shows the goals to prove and the
 hypotheses and variables in the current context. One might wish to use
 \texttt{IHre1} in a few of the goals, but the relevant terms are stuck under
-\texttt{exists}. In this state, I can focus on a particular subgoal and its
+\texttt{exists}. In this state, we can focus on a particular subgoal and its
 associated context and see explicitly all of the proof state.
 
-In the first goal, for example, I can proceed on the cases of our
+In the first goal, for example, we can proceed on the cases of our
 \(\func{Empty}\) reflection lemma: either \(\func{Empty}(\var{re_1})\) is true
 and the conditional collapses to \(s \matches \func{D}_a(\var{re_2})\), in which
 case the right side of the disjunct follows by the right side of the conjunct
@@ -727,9 +726,9 @@ exists s0 s1 : list ascii, s = s0 ++ s1
 \end{figure}
 
 In the second goal, \texttt{H} will be different, as shown in
-\figurename~\ref{F:r_derive2}. I can use this version to obtain witnesses for
+\figurename~\ref{F:r_derive2}. We can use this version to obtain witnesses for
 the existential claim on the left of the goal, and reason with \texttt{IHre1} to
-finish the conclusion. I cannot, however, use \texttt{IHre1} directly in the
+finish the conclusion. We cannot, however, use \texttt{IHre1} directly in the
 state shown, even though it would make the claim in \texttt{H} equivalent to the
 goal.
 
@@ -750,7 +749,7 @@ references.
 
 \subsection{Notable mentions}\label{S:ex_notable}
 
-In this section I will briefly highlight research in verified programs that is
+In this section we will briefly highlight research in verified programs that is
 particularly relevant to the insights gained from the previous examples. It will
 also introduce some of the open problems to be examined in
 Section~\ref{S:discussion}.
@@ -799,7 +798,7 @@ adapting the spatial reasoning technique to temporal reasoning. There are a few
 pieces of the Rust language missing, \eg, traits and \texttt{drop} destructors,
 but the work brings new confidence to the safety of Rust.
 
-I cannot mention RustBelt without also mentioning the significant work that has
+We cannot mention RustBelt without also mentioning the significant work that has
 been put into Iris~\cite{Jung_2015,Jung_2016,Krebbers_2017a,Jung_2018b}. The
 team has managed to distill many of the different concurrent separation logics
 (recall \figurename~\ref{F:iris_complex}) into a ``raw'' form from which they
@@ -891,7 +890,7 @@ also exposed common proof challenges, such as
         what to verify.
 \end{itemize}
 
-\paragraph{Serval.} I briefly mentioned Serval above; Serval is a framework for
+\paragraph{Serval.} We briefly mentioned Serval above; Serval is a framework for
 developing automatic verifiers for systems software~\cite{Nelson_2019}. In the
 case-study, the authors retrofit CertikOS~\cite{199344} and
 Komodo~\cite{Ferraiuolo_2017} and examined \gls{bpf} compilers in the Linux
@@ -920,7 +919,7 @@ Section~\ref{S:t_logic}.
 
 \subsection{Further reading}\label{S:ex_reading}
 
-In this section I offer a number of related projects and research for the
+In this section we offer a number of related projects and research for the
 interested. The seL4 project has developed a verified
 microkernel~\cite{Klein_EHACDEEKNSTW_09,Klein_AEHCDEEKNSTW_10,Klein_AEMSKH_14,Klein_AKMHF_18}.
 VeriSafeKV verified a key-value store based on the \(B^\epsilon\)-tree developed
@@ -954,7 +953,7 @@ file-systems that can be used to validate models and test file-systems of
 various stripes~\cite{Ridge_2015}. CSPEC is a framework for verifying concurrent
 software using mover types to re-order commutative operations~\cite{222565}.
 CertiKOS is yet another example of a verified concurrent \gls{os}
-kernel~\cite{199344}. For more on translation validation, I
+kernel~\cite{199344}. For more on translation validation, we
 recommend~\cite{Pnueli_1998}, which describes techniques employed in
 translation-validation for optimizing compilers~\cite{Necula_2000} and a
 verified \gls{os} kernel~\cite{Sewell_2013}. The \gls{vst} provides verifiable
