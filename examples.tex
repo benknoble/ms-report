@@ -11,7 +11,7 @@ expressions}\label{S:ex_ext}
 We have previously written two proofs of sufficient size and complexity that
 their study will demonstrate both common proof techniques and challenges. We will
 not provide all the details, in part because both were completed for academic
-exercises and We wish to avoid publishing full solutions, and in part because
+exercises and we wish to avoid publishing full solutions, and in part because
 some details are not relevant for the discussion here (proof scripts and
 programs available on request). It is important to note that in one case, there
 is no final executable program; rather, the proof is written entirely in a
@@ -33,7 +33,7 @@ in~\cite{Lewis_1997,Morrisett_2012}; details on the derivatives of regular
 expressions, also used in~\cite{Pierce:SF1,Morrisett_2012}, can be found
 in~\cite{Might_Yacc,Might_desugar,Might_deriv}. This proof does define a
 matching function that can be extracted to OCaml, Haskell, or Scheme;
-see~\cite{Coq_Extract} or~\cite[Extraction]{Pierce:SF1} for details.
+see~\cite{Coq_Extract} or~\cite[Ch.\ \emph{Extraction}]{Pierce:SF1} for details.
 
 We present the examples by following the chronology of their development. First,
 we develop a model of the theory (Section~\ref{S:ex_theory}). Second, we model
@@ -413,16 +413,16 @@ correctly implement matching; that is, \(\func{Match}(s, r)\) should be
 boolean and the matches relation is a proposition, which is, in general,
 undecidable. The two are not directly compatible with connectives like \(\iff\);
 that is, we cannot write \(\forall s, r: \func{Match}(s, r) \iff s \matches r\)
-as our specification. We could instead use the proposition \(\func{Match}(s, r) =
-\true\), but we choose to use a technique called ``proof by reflection.'' The
+as our specification. We could instead use the proposition \(\func{Match}(s, r)
+= \true\), but we choose to use a technique called ``proof by reflection.'' The
 idea is that some propositions are in fact decidable; as a witness, we provide a
 predicate that computes the truth value. The predicate is said to \emph{reflect}
 the proposition. We will write \(b \reflects P\) in these cases; note that
 implicitly \(\neg b \reflects \neg P\). To prove such a claim, we must show that
 in each possible case of the computation of \(b\), the proposition \(P\) is
 provable or derives a contradiction. We are able to make use of the (proved)
-fact that \(b \reflects P \equiv b = true \iff P\). Proof by reflection is a
-common and powerful technique for relating predicates to propositions and for
+fact that if \(b \reflects P\) then \(b = \true \iff P\). Proof by reflection is
+a common and powerful technique for relating predicates to propositions and for
 doing case-analysis over propositions in logics without the law of excluded
 middle\footnote{The LEM states \(\forall P, P \lor \neg P\). This is not assumed
 by Coq as Coq uses a constructive logic. It is possible to add the axiom;

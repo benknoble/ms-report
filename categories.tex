@@ -173,7 +173,7 @@ containing \(5\)) in Dafny are completely automatically checked by the Dafny
 compiler, as shown in \figurename~\ref{F:dafny_ex}. Let's also add the
 \(\func{IsPrime}\) predicate. Dafny can automatically find proofs for the
 primality of 0, 1, 2, and 3. At 6, however, Dafny doesn't know what to do, and
-the hint \(6 \mod 3 = 0\) is necessary to prove 6 is not prime. Removing the
+the hint \(6 \bmod 3 = 0\) is necessary to prove 6 is not prime. Removing the
 line causes a verification error; adding it gives Dafny enough to disprove the
 disjunct. Discovering that this is the missing information is rather like taking
 an educated guess.
@@ -181,18 +181,20 @@ an educated guess.
 \subsubsection{Automatic verification}
 
 The approach taken by Rosette~\cite{Torlak_2013}. An automatic verifier
-restricts the class of properties and programs that be verified in order to
+restricts the class of properties and programs that can be verified in order to
 fully automate the process. The essential limit is finitization: finite
 specifications that can be implemented without unbounded loops allows symbolic
 evaluation or execution to generate constraints that can be handed off to a
-solver, much like in auto-active verification. The developer thus programs in
-such a restricted verifier and pushes the ``verify button'', invoking the symbolic
-evaluator and constraint solver. The limitations allow a greater degree of
-automation than in the previous cases, leading to the descriptor ``push-button
-verification''---no proof annotations are necessary. Such verifiers have been used
-to build surprisingly sophisticated programs given the finitization requirement;
-examples include the Yggdrasil file-system~\cite{Sigurbjarnarson_2016} and the
-Hyperkernel \gls{os}~\cite{Nelson_2017}.
+solver, much like in auto-active verification (indeed, the architecture is
+similar to that of \figurename~\ref{F:dafny_arch}). The developer thus programs
+in such a restricted verifier and pushes the ``verify button'', invoking the
+symbolic evaluator and constraint solver. The limitations allow a greater degree
+of automation than in the previous cases, leading to the descriptor
+``push-button verification''---no proof annotations are necessary. Such
+verifiers have been used to build surprisingly sophisticated programs given the
+finitization requirement; examples include the Yggdrasil
+file-system~\cite{Sigurbjarnarson_2016} and the Hyperkernel
+\gls{os}~\cite{Nelson_2017}.
 
 \begin{figure}[ht]
 \begin{verbatim}
@@ -324,11 +326,12 @@ pre- and post-conditions with the \emph{Hoare triple}, written
 \end{equation*}
 
 to indicate that command \(C\) has pre-condition \(P\) and post-condition \(Q\),
-both assertions. As an example, consider
-the pre-condition \(X = 1\) and the command \(X \gets X + 1\) with the obvious
-semantics. It is easy to prove the post-condition \(X = 2\). We call such
-conditions \emph{assertions}---they map a state \(\sigma\) to a claim about the
-state, such as ``In state \(\sigma\), \(X\) is 1.''
+both assertions. As an example, consider the pre-condition \(X = 1\) and the
+command \(X \gets X + 1\) with the obvious semantics (in particular, the command
+\(X \gets n\) indicating assignment of \(n\) to \(X\)). It is easy to prove the
+post-condition \(X = 2\). We call such conditions \emph{assertions}---they map a
+state \(\sigma\) to a claim about the state, such as ``In state \(\sigma\),
+\(X\) is 1.''
 
 The triple states that, if \(P\) is established, executing \(C\) establishes
 \(Q\) (or \(C\) does not terminate). This statement can thus be written using
@@ -419,17 +422,17 @@ any behavior whatsoever is allowed!
 
 In a similar vein, we can always add extraneous information to the pre-condition
 which is not used; this does not necessarily invalidate our proof in the same
-way, but such information may not be needed. It is convenient to avoid
-unnecessarily strengthening pre-conditions in the overall program statement, as
-they might unnecessarily restrict the proof's application to the program. An
-example will clarify: consider \(\{X = 1\}X \gets X + 1\{X > 0\}\) with \(X \in
-\Z\) and the command \(X \gets n\) indicating assignment of \(n\) to \(X\).
-Clearly, the precondition is sufficient to establish the post-condition, but
-proving this triple only establishes the program's correctness when \(X = 1\).
-If we are interested in more than this narrow situation, we need a weaker
-pre-condition; otherwise, we are constrained to only trusting the program when
-\(X = 1\) holds. In this particular case, we only need to know that \(X + 1 >
-0\), \ie, \(X \ge 0\). Now our program is provably correct in many more cases.
+way as using \(\bot\), but such information may not be needed. It is convenient
+to avoid unnecessarily strengthening pre-conditions in the overall program
+statement, as they might unnecessarily restrict the proof's application to the
+program. An example will clarify: consider \(\{X = 1\}X \gets X + 1\{X > 0\}\)
+with \(X \in \Z\). Clearly, the precondition is sufficient to establish the
+post-condition, but proving this triple only establishes the program's
+correctness when \(X = 1\). If we are interested in more than this narrow
+situation, we need a weaker pre-condition; otherwise, we are constrained to only
+trusting the program when \(X = 1\) holds. In this particular case, we only need
+to know that \(X + 1 > 0\), \ie, \(X \ge 0\). Now our program is provably
+correct in many more cases.
 
 To prevent such absurd pre-conditions as \(\bot\) and to streamline their
 generation, many verifiers make use of ``weakest
@@ -557,7 +560,9 @@ The systems programmer is apt to look more towards C- and Rust- like verifiers; 
 lends itself to a choice of tools like Bedrock~\cite{Chlipala_2011},
 \gls{vst}~\cite{VST}, and CompCert~\cite{Kastner-LBSSF-2017}, possibly paired
 with (concurrent) separation logic. Ynot~\cite{Nanevski08ynot:reasoning} is also
-an option for those comfortable with monadic reasoning and Hoare logic.
+an option for those comfortable with monadic reasoning and Hoare logic. The
+software \texttt{creusot}~\cite{creusot} is under development for what appears
+to be auto-active Rust proofs.
 
 Programmers in ML-like languages have Coq~\cite{Coq}, CakeML~\cite{Kumar_2014},
 and similar tools to choose from; Lispers and Schemers look to both

@@ -48,7 +48,7 @@ verification tools---the latter is necessary to make verification amenable.
 Consequently, the verification tools also exhibit increasing complexity, with
 some being essentially expert systems\footnote{For a glance at the complexity of
 some systems, see~\cite{Jung_2015,Jung_2016,Krebbers_2017a,Jung_2018b} and
-\figurename~\ref{F:iris_complex}.} Other systems combine automation with domain
+\figurename~\ref{F:iris_complex}.}. Other systems combine automation with domain
 knowledge to create a narrower, more accessible tool. We will see some examples
 of this complexity and automation in Section~\ref{S:examples}.
 
@@ -61,11 +61,13 @@ with notes on what we will cover in the remainder of this report and what is out
 of scope; where possible, references are provided for further reading.
 
 The general idea is that, in order to fully trust a program implements its
-specification, we need two things. First, a proof at the source layer verifies
-that the program correctly implements its specification. Second, a proof that
-each intermediate layer preserves the validity of the previous layer's proof
-guarantees that the execution preserves the properties of the specification
-without repeating the work of the source-layer proof at each layer.
+specification, we need two things. First, we need a proof at the source layer.
+The source-layer proof verifies that the program correctly implements its
+specification. Second, we need a proof that each intermediate layer preserves
+the validity of the previous layer's proof. The composition of these
+intermediate-layer proofs guarantees that execution preserves the properties of
+the specification without repeating the work of the source-layer proof at each
+layer.
 
 \begin{figure}[ht]
     \centering
@@ -155,10 +157,10 @@ guarantees that the translation correctly and semantically matches the original.
 This has generated much work on translation validation~\cite{Pnueli_1998}, which
 proceeds by validating each run of a translator, comparing the executable code
 to the source and guaranteeing that a \emph{particular} set of executable code
-implements a \emph{particular} set of program source code. This is contrast to
-verified-translator proofs, which need to cover an entire class of programs. We
-will have only slightly more to say on this subject when we get to verified
-translators; we point the interested reader to works such
+implements a \emph{particular} set of program source code. This stands in
+contrast to verified-translator proofs, which need to cover an entire class of
+programs. We will have only slightly more to say on this subject when we get to
+verified translators; we point the interested reader to works such
 as~\cite{Sewell:phd,Sewell_KH_16,Sewell_2013,Necula_2000}.
 
 Items~\ref{i:stack_OS} and~\ref{i:stack_hardware} are out of scope for this
