@@ -648,7 +648,7 @@ string.
 %         \exists s_0, s_1: s = s_0 \texttt{++} s_1 \land s_0 \matches r \land s_1 \matches \func{Star}(r)
 %     \end{mathpar}
 % \end{lem}
-This prevents us from performing certain obvious rewrites that in
+The existential prevents us from performing certain obvious rewrites that in
 other situations would make the proof simpler. The issue is further demonstrated
 in the excerpts in \figurename~\ref{F:r_derive}.
 
@@ -763,7 +763,7 @@ Key components of their development include one of the first formal models of a
 large subset of x86, a DSL to specify and automatically analyze architecture
 semantics, and a framework for validating models against existing x86
 implementations. The DSL is based largely on grammars, regular expressions, and
-the derivatives we saw in the extended example. They also model
+the derivatives we saw in the extended example. They also model a
 non-deterministic register-transfer language which they convert to an
 interpretable function by means of an oracle---this enables the extraction of
 executable code. They consider several model-validation approaches, including
@@ -775,8 +775,9 @@ the authors raise include
     \item Formally modeling x86 is difficult: how can we handle concurrency?
     \item Can we embed the DSL in other proof-assistants to arrive at portable
         specifications?
-    \item Can we close the gap and verify the C implementation of the checker
-        and compile it with CompCert~\cite{Leroy-Compcert-CACM}?
+    \item Can we close the gap between the C implementation and the Coq proof?
+        Can we verify the C implementation of the checker and compile it with
+        CompCert~\cite{Leroy-Compcert-CACM}?
     \item Can we build more advanced checkers?
     \item Reasoning about bit-vectors is more tedious in Coq than in an
         \gls{smt} solver; how can we improve this?
@@ -787,16 +788,17 @@ the authors raise include
 \paragraph{RustBelt.} The RustBelt project has proven the Rust programming
 language's safety guarantees~\cite{Jung_2018a,Jung_2021}. The core of their
 arguments rely on inductive judgements like we saw in the extended example,
-formalized in Iris~\cite{Jung_2018b} on top of Coq, in order to prove that if a
-Rust program that does not use \texttt{unsafe} type-checks, it is indeed safe.
-They further demonstrated the conditions necessary for any given \texttt{unsafe}
-code to be safe, and proved several facts about the Rust standard library's
+formalized in Iris~\cite{Jung_2018b} on top of Coq. They proved that if a Rust
+program does not use \texttt{unsafe} and type-checks, it is indeed safe. They
+further demonstrated the conditions necessary for any given \texttt{unsafe} code
+to be safe, and proved several facts about the Rust standard library's
 \texttt{unsafe} usage, including the discovery of a few bugs. The proof is thus
-extendable: the whole program is safe if all the \texttt{unsafe} pieces are
-safe. They extended concurrent separation logic to handle Rust's lifetimes,
-adapting the spatial reasoning technique to temporal reasoning. There are a few
-pieces of the Rust language missing, \eg, traits and \texttt{drop} destructors,
-but the work brings new confidence to the safety of Rust.
+extendable: the whole program is safe if all the \texttt{unsafe} pieces are safe
+and the program type-checks. They extended concurrent separation logic to handle
+Rust's lifetimes, adapting the spatial reasoning technique to temporal
+reasoning. There are a few pieces of the Rust language missing, \eg, traits and
+\texttt{drop} destructors, but the work brings new confidence to the safety of
+Rust.
 
 We cannot mention RustBelt without also mentioning the significant work that has
 been put into Iris~\cite{Jung_2015,Jung_2016,Krebbers_2017a,Jung_2018b}. The
@@ -880,12 +882,12 @@ unverified components in the implementation, but the development helped find and
 fix bugs in the Linux kernel, which is a serious security concern. The proof
 also exposed common proof challenges, such as
 \begin{itemize}
-    \item finding the right inductive invariant,
+    \item finding the right inductive invariant;
     \item scaling the proof with existential quantifiers, explosion of symbolic
-        execution, and slow arithmetic operations,
+        execution, and slow arithmetic operations;
     \item cooperation between interactively verified components and automatically
-        verified components,
-    \item not taking a clean-slate approach to have real-world impact, and
+        verified components;
+    \item not taking a clean-slate approach to have real-world impact; and
     \item deciding what not to verify, which is often as important as deciding
         what to verify.
 \end{itemize}
@@ -903,11 +905,11 @@ input for verification is the assembly produced from the implementation. Serval
 also exposes challenges related to systems verification, such as memory models,
 as well as challenges of scale related to symbolic execution.
 
-\paragraph{Bedrock.} Bedrock is a possibly now-defunct\footnote{The software
-appears undeveloped since 2014, though it may just be that the development is
-stable.} but still interesting Coq development for low-level verification. The
-system enables reasoning about memory management and showcases a method similar
-to proof by reflection of verifying programs by comparison with
+\paragraph{Bedrock.} Bedrock is a possibly-defunct\footnote{The software appears
+undeveloped since 2014, though it may just be that the development is stable.}
+but still interesting Coq development for low-level verification. The system
+enables reasoning about memory management and showcases a method similar to
+proof by reflection of verifying programs by comparison with
 functional\footnote{In the paradigm sense, rather than in the sense of
 ``working.''} reference implementations. Bedrock was one of the first systems to
 enable reasoning about code pointers as data~\cite{Chlipala_2011} and
@@ -932,7 +934,7 @@ optimizations~\cite{Lopes_2018,Menendez_2016,Lopes_2015}. RedLeaf builds on
 SMACK, Boogie, and the Z3 \gls{smt} solver to build a safe and Hoare-logic
 verified \gls{os} kernel~\cite{Narayanan_2019,Narayan_2020}. Perennial brought
 Iris to a subset of Go to enable reasoning about crash-safe
-system~\cite{Chajed_2019}. AtomFS developed the first formally verified
+systems~\cite{Chajed_2019}. AtomFS developed the first formally verified
 fine-grained concurrent file system and presents a concurrent relational logic
 with helpers for reasoning about such systems~\cite{Zou_2019}. Vigor aids the
 development of network functions with a push-button, minimal-experience

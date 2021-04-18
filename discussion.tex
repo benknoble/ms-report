@@ -50,23 +50,23 @@ solve automation-related problems, especially exponential path explosion, scale,
 and timeout-demons. In a related vein, we saw the use of \texttt{\{:opaque\}} to
 combat automation issues related to quantifiers, and we also saw that Coq
 struggles to rewrite under the existential quantifier, demonstrating needs for
-improvements on these facets of the system.
+improvements on these facets of the verifiers.
 
 Iris and Section~\ref{S:t_logic} demonstrated that proof logics (\eg, extensions
-to Hoare-logic) are still under active development: although systems often need
-to build their own proof logics, checking that they are sound is a difficult
-process. Further, explaining and using them requires deep background. What new
-proof logics will we need to keep up with the state of programming technology?
-Iris was developed in part specifically for Rust; it also managed to position
-itself as a foundation for several older, more complex proof logics. As our
-language technology evolves, we will need increasingly sophisticated logics. We
-also hope to keep them accessible to the programmer writing proofs. Another
-possible direction here is to enable more rapid proof development: when
-developing a language model for a proof, like Rust, the programmer has to tie
-the syntax, semantics, and proof logic together. Facilitating these steps would
-help automate early development and allow the programmer to focus more on the
-proofs of interest. It would also enable a tighter feedback loop between model
-changes and proof updates.
+to Hoare-logic) are still under active development: although verifiers and
+proof-developments often need to build their own proof logics, checking that
+they are sound is a difficult process. Further, explaining and using them
+requires deep background. What new proof logics will we need to keep up with the
+state of programming technology? Iris was developed in part specifically for
+Rust; it also managed to position itself as a foundation for several older, more
+complex proof logics. As our language technology evolves, we will need
+increasingly sophisticated logics. We also hope to keep them accessible to the
+programmer writing proofs. Another possible direction here is to enable more
+rapid proof development: when developing a language model for a proof, like
+Rust, the programmer has to tie the syntax, semantics, and proof logic together.
+Facilitating these steps would help automate early development and allow the
+programmer to focus more on the proofs of interest. It would also enable a
+tighter feedback loop between model changes and proof updates.
 
 Section~\ref{S:t_pl} mentions several programming languages or paradigms along
 with their accompanying verification tools. Bringing verification to more
@@ -88,8 +88,8 @@ appropriate technology.
 When we looked at the extended examples in Section~\ref{S:ex_ext}, we saw early
 on that some programs and proofs produce executable programs, while others are
 only models that cannot actually be run. Proof by refinement can later tie an
-executable to the model, but refinement is often a meta-technique: there is no
-built-in support for the technique, so the programmer must build out both the
+executable to the model, but refinement is often a meta-technique: there may be
+no built-in support for the technique, so the programmer must build out both the
 technique and the argument that it is applicable. Similarly, the inductive
 state-machine model is better supported by some languages (\eg, Coq's inductive
 types) than others (\eg, Dafny's relation predicates, which are not tied
